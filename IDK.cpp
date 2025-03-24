@@ -3,12 +3,23 @@
 #include "IDK.h"
 
 #define KEY_DOWN(vk) (GetAsyncKeyState(vk) & 0x8000)
-
 using namespace std;
 
 HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
 HDC hdc = GetDC(hWnd);
+//Параметры рыбы
 int PEN_WIDTH = 1;
+int BODY_FOCUS_X = 100;
+int BODY_FOCUS_Y = 40;
+int REAR_FIN_HEIGHT = 70;
+int REAR_FIN_BASE = 100;
+int TOP_FIN_HEIGHT = 50;
+int TOP_FIN_BASE = 60;
+int BOTTOM_FIN_HEIGHT = -50;
+int BOTTOM_FIN_BASE = -60;
+int EYE_RADIUS = 7;
+int MOUTH_HEIGHT = -30;
+int MOUTH_BASE = -8;
 
 //defining Location methods
 
@@ -26,21 +37,87 @@ void Location::setY(int new_y) { y = new_y; }
 //defining Fish methods
 
 Fish::Fish(int new_x, int new_y) : Location(new_x, new_y) {}
-void Fish::body() {
+Fish::~Fish() {}
 
+void Fish::body() {
+	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, 
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_Y,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_Y
+	);
+	DeleteObject(hBrush);
 }
 void Fish::rear_fin() {
+	//use an array of points to declare a triangle
+	POINT* points = new POINT[3];
+	points[0] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y - REAR_FIN_BASE / 2 };
+	points[1] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y + REAR_FIN_BASE / 2 };
+	points[2] = { x - BODY_FOCUS_X + REAR_FIN_HEIGHT / 2, y };
 
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
 }
 void Fish::bottom_fin() {
+	POINT* points = new POINT[3];
+	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_Y + 15 };
 
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
 }
 void Fish::top_fin() {
+	POINT* points = new POINT[3];
+	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
+	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
+	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_Y - 15 };
 
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
 }
 void Fish::eye() {
-
+	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0)); //для заливки
+	SelectObject(hdc, hBrush);
+	//new_x + f1 / 2 + 30, new_y - 10, 7
+	//Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
+	Ellipse(hdc, 
+		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 , 
+		y - EYE_RADIUS - 10,
+		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30,
+		y + EYE_RADIUS - 10
+	);
+	DeleteObject(hBrush);
 }
 void Fish::mouth() {
+	//mouth = new Triangle(new_x + f1 - 20, new_y + 10, -30, -8);
+	POINT* points = new POINT[3];
+	points[0] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y - MOUTH_BASE / 2 + 10};
+	points[1] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + MOUTH_BASE / 2 + 10};
+	points[2] = { x + MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + 10};
 
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+void Fish::Show() {
+	rear_fin();
+	top_fin();
+	bottom_fin();
+	body();
+	eye();
+	mouth();
 }
