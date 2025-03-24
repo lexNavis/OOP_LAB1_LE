@@ -25,6 +25,16 @@ public:
 	void mouth();
 	virtual void Show();
 	virtual void Hide();
-	virtual void moveTo(int new_x, int new_y);
+	void moveTo(int new_x, int new_y);
 	void drag(int step);
+};
+
+class HatFish : public Fish {
+public:
+	HatFish(int new_x, int new_y);
+	~HatFish();
+	void hat();
+	virtual void Show();
+	virtual void Hide();
+	//добавить поведение при столкновении
 };
