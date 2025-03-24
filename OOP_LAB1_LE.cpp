@@ -20,9 +20,10 @@ int main() {
 	int x, y;
 	cout << "Enter (x, y):\n";
 	cin >> x >> y;
-	Fish AFish(x, y);
+	HatFish AFish(x, y);
 	AFish.Show();
 	system("pause");
 	//AFish.moveTo(x + 40, y);
+	//AFish.Hide();
 	AFish.drag(40);
 }
