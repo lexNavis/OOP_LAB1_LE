@@ -156,3 +156,45 @@ void Fish::drag(int step) {
 		Sleep(100);//чтоб эпилепсии не было
 	}
 }
+
+//HatFish
+HatFish::HatFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+HatFish::~HatFish() {}
+
+void HatFish::hat() {
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,	//focusX = 80, focusY = 15
+		x - 80,
+		y - BODY_FOCUS_Y - 15,
+		x + 80,
+		y - BODY_FOCUS_Y + 15
+	);
+	DeleteObject(hBrush);
+}
+
+void HatFish::Show() {
+	rear_fin();
+	top_fin();
+	bottom_fin();
+	body();
+	eye();
+	mouth();
+	hat();
+}
+//Так выходит, что функция то одинаковая :(
+void HatFish::Hide() {
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //он отрицательный надо на -1 домножить
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
+	DeleteObject(hBrush);
+	DeleteObject(hPen);
+}
