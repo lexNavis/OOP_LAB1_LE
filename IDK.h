@@ -17,7 +17,7 @@ class Fish : public Location {
 public:
 	Fish(int new_x, int new_y);
 	~Fish();
-	void body();
+	void body(); 
 	void rear_fin();
 	void bottom_fin();
 	void top_fin();
@@ -36,5 +36,33 @@ public:
 	void hat();
 	virtual void Show();
 	virtual void Hide();
-	//добавить поведение при столкновении
+	// Добавить поведение при столкновении
+	// Например, поднимать шляпу при столкновении с флагом 
+	// и менять шляпу на корону при столкновении с денежкой
+};
+
+class MutantFish : public Fish {
+public:
+	MutantFish(int new_x, int new_y);
+	~MutantFish();
+	void second_eye();
+	virtual void Show();
+	virtual void Hide();
+	// Добавить поведение при столкновении 
+	// Например, убрать хвост при столкновении с флагом 
+	// и добавить плавник при столкновении с денежкой
+};
+
+class CircleFish : public Fish {
+public:
+	CircleFish(int new_x, int new_y);
+	~CircleFish();
+	void body();
+	void bottom_fin();
+	void top_fin();
+	virtual void Show();
+	virtual void Hide();
+	// Добавить поведение при столкновении
+	// Например, сдуться в эллипс при столкновении с флагом 
+	// и стать вертикальным эллипсом при столкновении с денежкой
 };
