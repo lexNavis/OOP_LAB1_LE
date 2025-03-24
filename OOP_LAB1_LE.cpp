@@ -23,5 +23,6 @@ int main() {
 	Fish AFish(x, y);
 	AFish.Show();
 	system("pause");
-	AFish.Hide();
+	//AFish.moveTo(x + 40, y);
+	AFish.drag(40);
 }
