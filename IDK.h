@@ -25,6 +25,6 @@ public:
 	void mouth();
 	virtual void Show();
 	virtual void Hide();
-	//virtual void moveTo(int new_x, int new_y);
-	//void drag(int step);
+	virtual void moveTo(int new_x, int new_y);
+	void drag(int step);
 };
