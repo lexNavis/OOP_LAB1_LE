@@ -22,4 +22,6 @@ int main() {
 	cin >> x >> y;
 	Fish AFish(x, y);
 	AFish.Show();
+	system("pause");
+	AFish.Hide();
 }
