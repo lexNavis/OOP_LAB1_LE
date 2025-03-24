@@ -53,9 +53,9 @@ void Fish::body() {
 void Fish::rear_fin() {
 	//use an array of points to declare a triangle
 	POINT* points = new POINT[3];
-	points[0] = { x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2, y - abs(REAR_FIN_BASE) / 2 };
-	points[1] = { x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2, y + abs(REAR_FIN_BASE) / 2 };
-	points[2] = { x - BODY_FOCUS_X + abs(REAR_FIN_HEIGHT) / 2, y };
+	points[0] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y - REAR_FIN_BASE / 2 };
+	points[1] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y + REAR_FIN_BASE / 2 };
+	points[2] = { x - BODY_FOCUS_X + REAR_FIN_HEIGHT / 2, y };
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
 	SelectObject(hdc, hBrush);
@@ -65,9 +65,9 @@ void Fish::rear_fin() {
 }
 void Fish::bottom_fin() {
 	POINT* points = new POINT[3];
-	points[0] = { x - abs(BOTTOM_FIN_HEIGHT) / 2 - 25, y - abs(BOTTOM_FIN_BASE) / 2 + BODY_FOCUS_Y + 15 };
-	points[1] = { x - abs(BOTTOM_FIN_HEIGHT) / 2 - 25, y + abs(BOTTOM_FIN_BASE) / 2 + BODY_FOCUS_Y + 15 };
-	points[2] = { x + abs(BOTTOM_FIN_HEIGHT) / 2 - 25, y + BODY_FOCUS_Y + 15 };
+	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_Y + 15 };
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
 	SelectObject(hdc, hBrush);
@@ -77,9 +77,9 @@ void Fish::bottom_fin() {
 }
 void Fish::top_fin() {
 	POINT* points = new POINT[3];
-	points[0] = { x - abs(TOP_FIN_HEIGHT) / 2 + 25, y - abs(TOP_FIN_BASE) / 2 - BODY_FOCUS_Y - 15 };
-	points[1] = { x - abs(TOP_FIN_HEIGHT) / 2 + 25, y + abs(TOP_FIN_BASE) / 2 - BODY_FOCUS_Y - 15 };
-	points[2] = { x + abs(TOP_FIN_HEIGHT) / 2 + 25, y - BODY_FOCUS_Y - 15 };
+	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
+	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
+	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_Y - 15 };
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
 	SelectObject(hdc, hBrush);
@@ -103,9 +103,9 @@ void Fish::eye() {
 void Fish::mouth() {
 	//mouth = new Triangle(new_x + f1 - 20, new_y + 10, -30, -8);
 	POINT* points = new POINT[3];
-	points[0] = { x - abs(MOUTH_HEIGHT) / 2 + BODY_FOCUS_X - 20, y - abs(MOUTH_BASE) / 2 + 10 };
-	points[1] = { x - abs(MOUTH_HEIGHT) / 2 + BODY_FOCUS_X - 20, y + abs(MOUTH_BASE) / 2 + 10 };
-	points[2] = { x + abs(MOUTH_HEIGHT) / 2 + BODY_FOCUS_X - 20, y + 10};
+	points[0] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y - MOUTH_BASE / 2 + 10 };
+	points[1] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + MOUTH_BASE / 2 + 10 };
+	points[2] = { x + MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + 10};
 
 	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
 	SelectObject(hdc, hBrush);
@@ -135,4 +135,24 @@ void Fish::Hide() {
 	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
+}
+
+void Fish::moveTo(int new_x, int new_y) { //перемещение без обводки
+	Hide();
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
+
+void Fish::drag(int step) {
+	while (1) {
+		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		if (KEY_DOWN(VK_ESCAPE)) break;
+		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+		else if (KEY_DOWN(VK_UP))    y = y - step;
+		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+		moveTo(x, y);
+		Sleep(100);//чтоб эпилепсии не было
+	}
 }
