@@ -198,3 +198,111 @@ void HatFish::Hide() {
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
 }
+
+//MutantFish
+MutantFish::MutantFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+MutantFish::~MutantFish() {}
+
+void MutantFish::second_eye() {
+	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,	//focusX = 80, focusY = 15
+		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 20,
+		y - EYE_RADIUS - 10,
+		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 20,
+		y + EYE_RADIUS - 10
+	);
+	DeleteObject(hBrush);
+}
+
+void MutantFish::Show() {
+	rear_fin();
+	top_fin();
+	bottom_fin();
+	body();
+	eye();
+	second_eye();
+	mouth();
+}
+//Так выходит, что функция то одинаковая :(
+void MutantFish::Hide() {
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //он отрицательный надо на -1 домножить
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
+	DeleteObject(hBrush);
+	DeleteObject(hPen);
+}
+
+//CircleFish
+CircleFish::CircleFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+CircleFish::~CircleFish() {}
+
+void CircleFish::body() {
+	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hBrush);
+}
+
+void CircleFish::bottom_fin() {
+	POINT* points = new POINT[3];
+	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
+	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
+	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_X + 15 };
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+void CircleFish::top_fin() {
+	POINT* points = new POINT[3];
+	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
+	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
+	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_X - 15 };
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+
+void CircleFish::Show() {
+	rear_fin();
+	top_fin();
+	bottom_fin();
+	body();
+	eye();
+	mouth();
+}
+//Так выходит, что функция то одинаковая :(
+void CircleFish::Hide() {
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_X - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_X + 15 + abs(BOTTOM_FIN_BASE) / 2; //он отрицательный надо на -1 домножить
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
+	DeleteObject(hBrush);
+	DeleteObject(hPen);
+}
