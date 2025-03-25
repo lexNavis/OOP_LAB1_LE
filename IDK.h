@@ -66,3 +66,20 @@ public:
 	// Например, сдуться в эллипс при столкновении с флагом 
 	// и стать вертикальным эллипсом при столкновении с денежкой
 };
+
+//abstract obstacle class
+class Obstacle : public Location {
+protected:
+	int size_x; // len
+	int size_y;	// width
+public:
+	Obstacle(int new_x, int new_y, int new_szX, int new_szY);
+	~Obstacle();
+	//will be overwritten in child class
+	int  getsizeX();
+	void setsizeX(int new_szX);
+	int  getsizeY();
+	void setsizeY(int new_szY);
+	virtual void Show() = 0;
+	virtual void Hide() = 0;
+};
