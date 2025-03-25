@@ -7,8 +7,8 @@ using namespace std;
 
 HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
 HDC hdc = GetDC(hWnd);
-//Параметры рыбы
 int PEN_WIDTH = 1;
+//Параметры рыбы
 int BODY_FOCUS_X = 100;
 int BODY_FOCUS_Y = 40;
 int REAR_FIN_HEIGHT = 70;
@@ -306,3 +306,16 @@ void CircleFish::Hide() {
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
 }
+
+//defining Obstacle methods
+Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
+	size_x = new_szX;
+	size_y = new_szY;
+}
+Obstacle::~Obstacle() {}
+//void Obstacle::Show() {}
+//void Obstacle::Hide() {}
+int  Obstacle::getsizeX() { return size_x; }
+int  Obstacle::getsizeY() { return size_y; }
+void Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
+void Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
