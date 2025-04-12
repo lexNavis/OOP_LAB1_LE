@@ -13,9 +13,21 @@ public:
 	void setY(int new_y);
 };
 
+class Point : public Location {
+protected:
+	bool visible;
+public:
+	Point(int new_x, int new_y);
+	~Point();
+	void setVisible(bool new_visible);
+	bool isVisible();
+	void moveTo(int new_x, int new_y);
+	virtual void Show();
+	virtual void Hide();
+};
 
 //abstract obstacle class (ith rectangular border)
-class Obstacle : public Location {
+class Obstacle : public Point {
 protected:
 	int size_x; // len
 	int size_y;	// width
@@ -40,7 +52,17 @@ public:
 	virtual void Hide();
 };
 
-class Fish : public Location {
+class Disc : public Obstacle {
+protected:
+public:
+	Disc(int new_x, int new_y, int new_szX, int new_szY);
+	~Disc();
+	virtual void Show();
+	virtual void Hide();
+
+};
+
+class Fish : public Point {
 public:
 	Fish(int new_x, int new_y);
 	~Fish();
@@ -70,7 +92,7 @@ public:
 	virtual void react(Flag* flag);
 	// Добавить поведение при столкновении
 	// Например, поднимать шляпу при столкновении с флагом 
-	// и менять шляпу на корону при столкновении с денежкой
+	// и менять шляпу на корону при столкновении с диском
 };
 
 class MutantFish : public Fish {
@@ -85,7 +107,7 @@ public:
 	virtual void react(Flag* flag);
 	// Добавить поведение при столкновении 
 	// Например, добавить третий глаз при столкновении с флагом 
-	// и добавить плавник при столкновении с денежкой
+	// и лишить глаз вообще при столкновении с диском
 };
 
 class CircleFish : public Fish {
@@ -103,5 +125,5 @@ public:
 	virtual void react(Flag* flag);
 	// Добавить поведение при столкновении
 	// Например, сдуться в эллипс при столкновении с флагом 
-	// и стать вертикальным эллипсом при столкновении с денежкой
+	// и стать вертикальным эллипсом при столкновении с диском
 };
