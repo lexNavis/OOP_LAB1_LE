@@ -1,3 +1,17 @@
+/**************************************************************
+*                      Программирование                       *
+* ----------------------------------------------------------  *
+* Project Type: Win64 Console Application                     *
+* Project Name: OOP_LAB1_LE                                   *
+* File Name: OOP_LAB1_LE.cpp				                  *
+* Programmers:Шеин Д.К., Бригада 4, Группа 209Б               *
+* Modified -                                                  *
+* Created: 23.03.25                                           *
+* Last Revision: 12.04.24                                     *
+* Comment: Использование принципов ООП для создании иерархии  *
+* рыб                                                         *
+***************************************************************/
+
 #include <Windows.h>
 #include <iostream>
 #include "IDK.h"
@@ -6,53 +20,16 @@
 
 using namespace std;
 
-int PPM = 40; //Pixels Per Move
-bool EXIT_TASK = false; //to break infinite loops
-
-void ClearScreen() {
-	HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
-	HDC hdc = GetDC(hWnd);
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
-	SelectObject(hdc,hBrush);
-	Rectangle(hdc, 0, 0, 1920, 1080);
-	DeleteObject(hBrush);
-}
-
-void OperateWith(Fish* fish) {
-    while (!EXIT_TASK) {
-        cout << "Выберите действие над базовой рыбой: \n"
-            << "1 - Показать на экране\n"
-            << "2 - Скрыть\n"
-            << "3 - Перемещать\n"
-            << "Другая цифра - Вернуться на главную\n";
-        int choice;
-        cin >> choice;
-        system("cls");
-        switch (choice) {
-            case 1: { fish->Show();    break; }
-            case 2: { fish->Hide();    break; }
-            case 3: { fish->drag(PPM); break; }
-            default: {
-                EXIT_TASK = true;
-                cout << "Возращаем...\n";
-                break;
-            }
-        }
-    }
-}
+//int PPM = 40; //Pixels Per Move
+//bool EXIT_TASK = false; //to break infinite loops
 
 int main() {
     setlocale(LC_ALL, "RUSSIAN");
-    HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
-    HDC hdc = GetDC(hWnd);
-    HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
-    SelectObject(hdc, hBrush);
-    Rectangle(hdc, 0, 0, 1920, 1080);
+    ClearScreen();
     int x = 0, y = 0;
-
     while (1)
     {
-        EXIT_TASK = false;
+        //EXIT_TASK = false;
         cout << "Выберите действие: \n"
             << "1 - Создать базовую рыбу\n"
             << "2 - Создать рыбу с шляпой\n"
@@ -99,8 +76,6 @@ int main() {
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
                     << "3 - Перемещать\n"
-                    << "4 - Патриотичная форма\n"
-                    << "5 - Вернуться в обычную форму\n"
                     << "Другая цифра - Вернуться на главную\n";
                 cin >> choice;
                 system("cls");
@@ -127,7 +102,6 @@ int main() {
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
                     << "3 - Перемещать\n"
-                    << "4 - Диско - форма\n"
                     << "Другая цифра - Вернуться на главную\n";
                 cin >> choice;
                 system("cls");
@@ -154,7 +128,6 @@ int main() {
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
                     << "3 - Перемещать\n"
-                    << "4 - Диско - форма\n"
                     << "Другая цифра - Вернуться на главную\n";
                 cin >> choice;
                 system("cls");
