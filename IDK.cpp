@@ -18,11 +18,11 @@
 #define KEY_DOWN(vk) (GetAsyncKeyState(vk) & 0x8000)
 using namespace std;
 
-HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
-HDC hdc = GetDC(hWnd);
-
 int PEN_WIDTH = 1;  // Толщина пера
 int PPM = 40;		// Pixels Per Move
+
+HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
+HDC hdc = GetDC(hWnd);
 
 // Параметры рыбы
 int BODY_FOCUS_X = 100;
@@ -145,10 +145,20 @@ Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {}
 Fish::~Fish() {}
 
 // Рисование тела рыбы
-void Fish::body() {
-	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
+void Fish::body(int clr1 = 127, int clr2 = 255, int clr3 = 0) {	//салатовый
+	// Чтобы не обводило черным цветом
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_Y,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_Y
+	);
+	DeleteObject(hPen);
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3));
 	SelectObject(hdc, hBrush);
-	Ellipse(hdc, 
+	Ellipse(hdc,
 		x - BODY_FOCUS_X,
 		y - BODY_FOCUS_Y,
 		x + BODY_FOCUS_X,
@@ -158,14 +168,14 @@ void Fish::body() {
 }
 
 // Рисование заднего плавника
-void Fish::rear_fin() {
+void Fish::rear_fin(int clr1, int clr2, int clr3) {
 	//use an array of points to declare a triangle
 	POINT* points = new POINT[3];
 	points[0] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y - REAR_FIN_BASE / 2 };
 	points[1] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y + REAR_FIN_BASE / 2 };
 	points[2] = { x - BODY_FOCUS_X + REAR_FIN_HEIGHT / 2, y };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
@@ -173,13 +183,13 @@ void Fish::rear_fin() {
 }
 
 // Рисование нижнего плавника
-void Fish::bottom_fin() {
+void Fish::bottom_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
 	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
 	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_Y + 15 };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
@@ -187,39 +197,39 @@ void Fish::bottom_fin() {
 }
 
 // Рисование верхнего плавника
-void Fish::top_fin() {
+void Fish::top_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
 	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_Y - 15 };
 	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_Y - 15 };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
 	delete[] points;
 }
-void Fish::eye() {
-	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0)); //для заливки
+void Fish::eye(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	//new_x + f1 / 2 + 30, new_y - 10, 7
 	//Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-	Ellipse(hdc, 
-		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 , 
+	Ellipse(hdc,
+		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30,
 		y - EYE_RADIUS - 10,
 		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30,
 		y + EYE_RADIUS - 10
 	);
 	DeleteObject(hBrush);
 }
-void Fish::mouth() {
+void Fish::mouth(int clr1, int clr2, int clr3) {
 	//mouth = new Triangle(new_x + f1 - 20, new_y + 10, -30, -8);
 	POINT* points = new POINT[3];
 	points[0] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y - MOUTH_BASE / 2 + 10 };
 	points[1] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + MOUTH_BASE / 2 + 10 };
-	points[2] = { x + MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + 10};
+	points[2] = { x + MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + 10 };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
@@ -228,31 +238,22 @@ void Fish::mouth() {
 
 // Отображение и сокрытие рыбы
 void Fish::Show() {
-	rear_fin();
-	top_fin();
-	bottom_fin();
-	body();
-	eye();
-	mouth();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
 
 	visible = true;
 }
 void Fish::Hide() {
-	// Для сокрытия рыбы поверх нее рисуется прямоугольник, покрывающий её всю
-	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-		x2 = x + BODY_FOCUS_X,
-		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //основание отрицательное, надо модуль брать
-	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-	SelectObject(hdc, hPen);
-	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
-
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
-	SelectObject(hdc, hBrush);
-	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
-	DeleteObject(hBrush);
-	DeleteObject(hPen);
-
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	mouth(255, 255, 255);
 	visible = false;
 }
 
@@ -264,8 +265,8 @@ HatFish::HatFish(int new_x, int new_y) : Fish(new_x, new_y) {}
 HatFish::~HatFish() {}
 
 // Рисование шляпы
-void HatFish::hat() {
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0)); //салатовый
+void HatFish::hat(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
 	SelectObject(hdc, hBrush);
 	Ellipse(hdc,	//focusX = 80, focusY = 15
 		x - 80,
@@ -278,30 +279,28 @@ void HatFish::hat() {
 
 // Переопределение родительских методов Show и Hide
 void HatFish::Show() {
-	rear_fin();
-	top_fin();
-	bottom_fin();
-	body();
-	eye();
-	mouth();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
 
 	// Отличие предка от потомка - наличие шляпы
-	hat();		
+	hat(255, 0, 0);
+
+	visible = true;
 }
 void HatFish::Hide() {
-	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-		x2 = x + BODY_FOCUS_X,
-		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //основание отрицательное, надо модуль брать
-	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-	SelectObject(hdc, hPen);
-	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	mouth(255, 255, 255);
+	hat(255, 255, 255);
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
-	SelectObject(hdc, hBrush);
-	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
-	DeleteObject(hBrush);
-	DeleteObject(hPen);
+	visible = false;
 }
 
 /**********************************************************
@@ -312,8 +311,8 @@ MutantFish::MutantFish(int new_x, int new_y) : Fish(new_x, new_y) {}
 MutantFish::~MutantFish() {}
 
 // Рисование второго глаза
-void MutantFish::second_eye() {
-	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0)); //салатовый
+void MutantFish::second_eye(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
 	SelectObject(hdc, hBrush);
 	Ellipse(hdc,	//focusX = 80, focusY = 15
 		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 20,
@@ -326,31 +325,25 @@ void MutantFish::second_eye() {
 
 // Переопределение родительских методов Show и Hide
 void MutantFish::Show() {
-	rear_fin();
-	top_fin();
-	bottom_fin();
-	body();
-	eye();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
 	// Отличие предка от потомка - наличие второго глаза
-	second_eye();
-	mouth();
+	second_eye(0, 0, 0);
+	mouth(169, 169, 169);
 
 	visible = true;
 }
 void MutantFish::Hide() {
-	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-		x2 = x + BODY_FOCUS_X,
-		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //он отрицательный надо на -1 домножить
-	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-	SelectObject(hdc, hPen);
-	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
-
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
-	SelectObject(hdc, hBrush);
-	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
-	DeleteObject(hBrush);
-	DeleteObject(hPen);
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	second_eye(255, 255, 255);
+	mouth(255, 255, 255);
 
 	visible = false;
 }
@@ -363,8 +356,8 @@ CircleFish::CircleFish(int new_x, int new_y) : Fish(new_x, new_y) {}
 CircleFish::~CircleFish() {}
 
 // Переопределение метода тела рыбы, так как форма не эллипс, а шар
-void CircleFish::body() {
-	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
+void CircleFish::body(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
 	SelectObject(hdc, hBrush);
 	Ellipse(hdc,
 		x - BODY_FOCUS_X,
@@ -375,25 +368,25 @@ void CircleFish::body() {
 	DeleteObject(hBrush);
 }
 // Вследствие иного тела, положение плавников меняется
-void CircleFish::bottom_fin() {
+void CircleFish::bottom_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
 	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
 	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_X + 15 };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
 	delete[] points;
 }
-void CircleFish::top_fin() {
+void CircleFish::top_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
 	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
 	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_X - 15 };
 
-	HBRUSH hBrush = CreateSolidBrush(RGB(169, 169, 169)); //для заливки
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
 	Polygon(hdc, points, 3);
 	DeleteObject(hBrush);
@@ -402,31 +395,22 @@ void CircleFish::top_fin() {
 
 // Переопределение родительских методов Show и Hide
 void CircleFish::Show() {
-	rear_fin();
-	top_fin();
-	bottom_fin();
-	body();
-	eye();
-	mouth();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
 
 	visible = true;
 }
 void CircleFish::Hide() {
-	// Для заливки используется прямоугольник других размеров
-	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-		x2 = x + BODY_FOCUS_X,
-		y1 = y - BODY_FOCUS_X - 15 - abs(TOP_FIN_BASE) / 2,
-		y2 = y + BODY_FOCUS_X + 15 + abs(BOTTOM_FIN_BASE) / 2; //он отрицательный надо на -1 домножить
-
-	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-	SelectObject(hdc, hPen);
-	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
-
-	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
-	SelectObject(hdc, hBrush);
-	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
-	DeleteObject(hBrush);
-	DeleteObject(hPen);
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	mouth(255, 255, 255);
 
 	visible = false;
 }
@@ -781,4 +765,24 @@ void CircleFish::Hide() {
 //	DeleteObject(hBrush);
 //
 //	visible = false;
+//}
+
+/****************************************************************
+*							Остальное							*
+****************************************************************/
+// Если вдруг надо стирать более простым образом
+//void HatFish::Hide() {
+//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+//		x2 = x + BODY_FOCUS_X,
+//		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+//		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //основание отрицательное, надо модуль брать
+//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+//	SelectObject(hdc, hPen);
+//	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
+//
+//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
+//	SelectObject(hdc, hBrush);
+//	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
+//	DeleteObject(hBrush);
+//	DeleteObject(hPen);
 //}
