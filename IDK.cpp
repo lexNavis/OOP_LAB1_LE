@@ -21,10 +21,6 @@ int EYE_RADIUS = 7;
 int MOUTH_HEIGHT = -30;
 int MOUTH_BASE = -8;
 
-//проверка вхождения точки в область
-//bool IsInArea(int x, int y, int x1, int x2, int y1, int y2) {
-//
-//}
 
 
 //defining Location methods
@@ -40,9 +36,32 @@ int  Location::getY() { return y; }
 void Location::setX(int new_x) { x = new_x; }
 void Location::setY(int new_y) { y = new_y; }
 
+// Point methods
+Point::Point(int new_x, int new_y) : Location(new_x, new_y) {
+	visible = false;
+}
+Point::~Point() {}
+
+void Point::setVisible(bool new_visible) { visible = new_visible; }
+bool Point::isVisible() { return visible; }
+void Point::moveTo(int new_x, int new_y) {
+	Hide();
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
+void Point::Show() {
+	visible = true;
+	SetPixel(hdc, x, y, RGB(255, 0, 0));
+}
+void Point::Hide() {
+	visible = false;
+	SetPixel(hdc, x, y, RGB(255, 255, 255));
+}
+
 //defining Fish methods
 
-Fish::Fish(int new_x, int new_y) : Location(new_x, new_y) {}
+Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {}
 Fish::~Fish() {}
 
 void Fish::body() {
@@ -126,6 +145,8 @@ void Fish::Show() {
 	body();
 	eye();
 	mouth();
+
+	visible = true;
 }
 void Fish::Hide() {
 	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
@@ -141,6 +162,8 @@ void Fish::Hide() {
 	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
+
+	visible = false;
 }
 // Рассмотрим столкновение прямоугольника, 
 // в котором заключена фигура, и прямоугольника препятствия
@@ -336,6 +359,8 @@ void MutantFish::Show() {
 	eye();
 	second_eye();
 	mouth();
+
+	visible = true;
 }
 //Так выходит, что функция то одинаковая :(
 void MutantFish::Hide() {
@@ -352,6 +377,8 @@ void MutantFish::Hide() {
 	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
+
+	visible = false;
 }
 
 bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
@@ -466,6 +493,8 @@ void CircleFish::Show() {
 	body();
 	eye();
 	mouth();
+
+	visible = true;
 }
 void CircleFish::Hide() {
 	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
@@ -481,6 +510,8 @@ void CircleFish::Hide() {
 	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
 	DeleteObject(hBrush);
 	DeleteObject(hPen);
+
+	visible = false;
 }
 
 void CircleFish::react(Flag* flag) {
@@ -522,7 +553,7 @@ bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
 }
 
 //defining Obstacle methods
-Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
+Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Point(new_x, new_y) {
 	size_x = new_szX;
 	size_y = new_szY;
 }
@@ -555,6 +586,8 @@ void Flag::Show() {
 	SelectObject(hdc, hBrush);
 	Rectangle(hdc, x - size_x / 2, y + size_y / 6, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
+
+	visible = true;
 }
 void Flag::Hide() {
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
@@ -566,5 +599,61 @@ void Flag::Hide() {
 	SelectObject(hdc, hBrush);
 	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
+
+	visible = false;
 }
 
+Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
+
+}
+Disc::~Disc() {}
+void Disc::Show() {
+
+	//border of first circle
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(0, 0, 0)); SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+
+	//inner part of first circle
+	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 139));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//border of second circle
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
+
+	//inner part of second circle
+	hBrush = CreateSolidBrush(RGB(90, 90, 90));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
+	DeleteObject(hBrush);
+
+	//border of third circle
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
+
+	//inner part of third circle
+	hBrush = CreateSolidBrush(RGB(0, 0, 255));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
+	DeleteObject(hBrush);
+
+	DeleteObject(hPen);
+
+	visible = true;
+
+}
+void Disc::Hide() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	visible = false;
+}
