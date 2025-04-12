@@ -94,12 +94,12 @@ public:
 	Fish(int new_x, int new_y);
 	~Fish();
 	// ћетоды, отображающие основные части рыбы на экране
-	void body(int clr1, int clr2, int clr3);
-	void rear_fin(int clr1, int clr2, int clr3);
-	void bottom_fin(int clr1, int clr2, int clr3);
-	void top_fin(int clr1, int clr2, int clr3);
-	void eye(int clr1, int clr2, int clr3);
-	void mouth(int clr1, int clr2, int clr3);
+	void body(); 
+	void rear_fin();
+	void bottom_fin();
+	void top_fin();
+	void eye();
+	void mouth();
 
 	// ѕереопределеные методы Hide и Show дл€ базовой рыбы
 	virtual void Show();
@@ -117,7 +117,7 @@ public:
 	~HatFish();
 	
 	// ќбъ€вление уникальных методов - шл€пы и подн€той шл€пы
-	void hat(int clr1, int clr2, int clr3);
+	void hat();
 	//void hat_up();
 
 	virtual void Show();
@@ -137,7 +137,7 @@ public:
 	~MutantFish();
 
 	// ќбъ€вление уникальных методов - второго глаза и третьего глаза
-	void second_eye(int clr1, int clr2, int clr3);
+	void second_eye();
 	//void third_eye();
 
 	virtual void Show();
@@ -156,11 +156,11 @@ public:
 	CircleFish(int new_x, int new_y);
 	~CircleFish();
 	// ќбъ€вление уникальных методов - круглого, утонченного и утолщенного тел, иного положени€ плавников
-	void body(int clr1, int clr2, int clr3);
+	void body();
 	//void slim_body();
 	//void fat_body();
-	void bottom_fin(int clr1, int clr2, int clr3);
-	void top_fin(int clr1, int clr2, int clr3);
+	void bottom_fin();
+	void top_fin();
 
 	virtual void Show();
 	virtual void Hide();
