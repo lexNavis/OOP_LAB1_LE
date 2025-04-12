@@ -41,8 +41,8 @@ public:
 	void setVisible(bool new_visible);
 	bool isVisible();
 
-	virtual void Show();
-	virtual void Hide();
+	void Show();
+	void Hide();
 
 	void moveTo(int new_x, int new_y);
 	void drag(int step);
@@ -102,9 +102,10 @@ public:
 	void mouth(int clr1, int clr2, int clr3);
 
 	// Переопределеные методы Hide и Show для базовой рыбы
-	virtual void Show();
-	virtual void Hide();
-
+	void Show();
+	void Hide();
+	void moveTo(int new_x, int new_y);
+	void drag(int step);
 	// Для дальнейшего использования
 	//virtual bool hasCollisionWith(Obstacle* obstacle);
 	//virtual void react(Flag* flag);
@@ -120,9 +121,10 @@ public:
 	void hat(int clr1, int clr2, int clr3);
 	//void hat_up();
 
-	virtual void Show();
-	virtual void Hide();
-
+	void Show();
+	void Hide();
+	void moveTo(int new_x, int new_y);
+	void drag(int step);
 	//virtual bool hasCollisionWith(Obstacle* obstacle);
 	//virtual void react(Flag* flag);
 	// Добавить поведение при столкновении
@@ -140,9 +142,10 @@ public:
 	void second_eye(int clr1, int clr2, int clr3);
 	//void third_eye();
 
-	virtual void Show();
-	virtual void Hide();
-
+	void Show();
+	void Hide();
+	void moveTo(int new_x, int new_y);
+	void drag(int step);
 	//virtual bool hasCollisionWith(Obstacle* obstacle);
 	//virtual void react(Flag* flag);
 	// Добавить поведение при столкновении 
@@ -162,9 +165,10 @@ public:
 	void bottom_fin(int clr1, int clr2, int clr3);
 	void top_fin(int clr1, int clr2, int clr3);
 
-	virtual void Show();
-	virtual void Hide();
-
+	void Show();
+	void Hide();
+	void moveTo(int new_x, int new_y);
+	void drag(int step);
 	//virtual bool hasCollisionWith(Obstacle* obstacle);
 	//virtual void react(Flag* flag);
 

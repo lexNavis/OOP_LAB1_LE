@@ -256,7 +256,28 @@ void Fish::Hide() {
 	mouth(255, 255, 255);
 	visible = false;
 }
+void Fish::moveTo(int new_x, int new_y) {
+	Hide();
+	// Перемещение "центра" в новое место
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
 
+// Продолжительное движение с заданным шагом
+void Fish::drag(int step) {
+	while (1) {
+		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		// Обработка нажатия клавиш - выбор направления
+		if (KEY_DOWN(VK_ESCAPE)) break;
+		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+		else if (KEY_DOWN(VK_UP))    y = y - step;
+		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+		moveTo(x, y);
+		Sleep(200);
+	}
+}
 /**********************************************************
 *				МЕТОДЫ КЛАССА HatFish					  *
 **********************************************************/
@@ -302,6 +323,28 @@ void HatFish::Hide() {
 
 	visible = false;
 }
+void Fish::moveTo(int new_x, int new_y) {
+	Hide();
+	// Перемещение "центра" в новое место
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
+
+// Продолжительное движение с заданным шагом
+void Fish::drag(int step) {
+	while (1) {
+		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		// Обработка нажатия клавиш - выбор направления
+		if (KEY_DOWN(VK_ESCAPE)) break;
+		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+		else if (KEY_DOWN(VK_UP))    y = y - step;
+		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+		moveTo(x, y);
+		Sleep(200);
+	}
+}
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА MutantFish				  *
@@ -346,6 +389,28 @@ void MutantFish::Hide() {
 	mouth(255, 255, 255);
 
 	visible = false;
+}
+void MutantFish::moveTo(int new_x, int new_y) {
+	Hide();
+	// Перемещение "центра" в новое место
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
+
+// Продолжительное движение с заданным шагом
+void MutantFish::drag(int step) {
+	while (1) {
+		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		// Обработка нажатия клавиш - выбор направления
+		if (KEY_DOWN(VK_ESCAPE)) break;
+		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+		else if (KEY_DOWN(VK_UP))    y = y - step;
+		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+		moveTo(x, y);
+		Sleep(200);
+	}
 }
 
 /**********************************************************
@@ -415,8 +480,28 @@ void CircleFish::Hide() {
 	visible = false;
 }
 
+void CircleFish::moveTo(int new_x, int new_y) {
+	Hide();
+	// Перемещение "центра" в новое место
+	setX(new_x);
+	setY(new_y);
+	Show();
+}
 
-
+// Продолжительное движение с заданным шагом
+void CircleFish::drag(int step) {
+	while (1) {
+		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		// Обработка нажатия клавиш - выбор направления
+		if (KEY_DOWN(VK_ESCAPE)) break;
+		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+		else if (KEY_DOWN(VK_UP))    y = y - step;
+		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+		moveTo(x, y);
+		Sleep(200);
+	}
+}
 
 /****************************************************************
 *						ЗАГОТОВКИ ДЛЯ ВСТАВОК					*
