@@ -1,4 +1,18 @@
+/**************************************************************
+*                      Программирование                       *
+* ----------------------------------------------------------  *
+* Project Type: Win64 Console Application                     *
+* Project Name: OOP_LAB1_LE                                   *
+* File Name: IDK.h					                          *
+* Programmers:Шеин Д.К., Бригада 4, Группа 209Б               *
+* Modified -                                                  *
+* Created: 23.03.25                                           *
+* Last Revision: 12.04.24                                     *
+* Comment: Объявление классов						          *
+***************************************************************/
+
 #pragma once
+
 /**********************************************************
 *					ОБЪЯВЛЕНИЕ КЛАССОВ					  *
 **********************************************************/
@@ -26,49 +40,53 @@ public:
 	~Point();
 	void setVisible(bool new_visible);
 	bool isVisible();
+
+	virtual void Show();
+	virtual void Hide();
+
 	void moveTo(int new_x, int new_y);
-	virtual void Show();
-	virtual void Hide();
+	void drag(int step);
+	
 };
 
-// Абстрактный класс, описывающий препятствие на экране
-class Obstacle : public Point {
-protected:
-	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
-	int size_x; 
-	int size_y;	
-public:
-	Obstacle(int new_x, int new_y, int new_szX, int new_szY);
-	~Obstacle();
-	int  getsizeX();
-	void setsizeX(int new_szX);
-	int  getsizeY();
-	void setsizeY(int new_szY);
-	// Чистые виртуальные методы, переопределенные в потомках
-	virtual void Show() = 0;
-	virtual void Hide() = 0;
-};
-
-// Класс, описывающий препятствие - флаг
-class Flag : public Obstacle {
-protected:
-public:
-	Flag(int new_x, int new_y, int new_szX, int new_szY);
-	~Flag();
-	// Переопределеные методы Hide и Show для флага
-	virtual void Show();
-	virtual void Hide();
-};
-// Класс, описывающий препятствие - диск
-class Disc : public Obstacle {
-protected:
-public:
-	Disc(int new_x, int new_y, int new_szX, int new_szY);
-	~Disc();
-	// Переопределеные методы Hide и Show для диска
-	virtual void Show();
-	virtual void Hide();
-};
+//// Абстрактный класс, описывающий препятствие на экране
+//class Obstacle : public Point {
+//protected:
+//	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
+//	int size_x; 
+//	int size_y;	
+//public:
+//	Obstacle(int new_x, int new_y, int new_szX, int new_szY);
+//	~Obstacle();
+//	int  getsizeX();
+//	void setsizeX(int new_szX);
+//	int  getsizeY();
+//	void setsizeY(int new_szY);
+//	// Чистые виртуальные методы, переопределенные в потомках
+//	virtual void Show() = 0;
+//	virtual void Hide() = 0;
+//};
+//
+//// Класс, описывающий препятствие - флаг
+//class Flag : public Obstacle {
+//protected:
+//public:
+//	Flag(int new_x, int new_y, int new_szX, int new_szY);
+//	~Flag();
+//	// Переопределеные методы Hide и Show для флага
+//	virtual void Show();
+//	virtual void Hide();
+//};
+//// Класс, описывающий препятствие - диск
+//class Disc : public Obstacle {
+//protected:
+//public:
+//	Disc(int new_x, int new_y, int new_szX, int new_szY);
+//	~Disc();
+//	// Переопределеные методы Hide и Show для диска
+//	virtual void Show();
+//	virtual void Hide();
+//};
 
 // Базовый класс, описывающий рыбу
 class Fish : public Point {
@@ -88,11 +106,8 @@ public:
 	virtual void Hide();
 
 	// Для дальнейшего использования
-	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-
-	void moveTo(int new_x, int new_y);
-	void drag(int step);
+	//virtual bool hasCollisionWith(Obstacle* obstacle);
+	//virtual void react(Flag* flag);
 };
 
 // Производный класс, описывающий рыбу с шляпой
@@ -103,13 +118,13 @@ public:
 	
 	// Объявление уникальных методов - шляпы и поднятой шляпы
 	void hat();
-	void hat_up();
+	//void hat_up();
 
 	virtual void Show();
 	virtual void Hide();
 
-	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
+	//virtual bool hasCollisionWith(Obstacle* obstacle);
+	//virtual void react(Flag* flag);
 	// Добавить поведение при столкновении
 	// Например, поднимать шляпу при столкновении с флагом 
 	// и менять шляпу на корону при столкновении с диском
@@ -123,13 +138,13 @@ public:
 
 	// Объявление уникальных методов - второго глаза и третьего глаза
 	void second_eye();
-	void third_eye();
+	//void third_eye();
 
 	virtual void Show();
 	virtual void Hide();
 
-	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
+	//virtual bool hasCollisionWith(Obstacle* obstacle);
+	//virtual void react(Flag* flag);
 	// Добавить поведение при столкновении 
 	// Например, добавить третий глаз при столкновении с флагом 
 	// и лишить глаз вообще при столкновении с диском
@@ -142,17 +157,26 @@ public:
 	~CircleFish();
 	// Объявление уникальных методов - круглого, утонченного и утолщенного тел, иного положения плавников
 	void body();
-	void slim_body();
-	void fat_body();
+	//void slim_body();
+	//void fat_body();
 	void bottom_fin();
 	void top_fin();
 
 	virtual void Show();
 	virtual void Hide();
 
-	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
+	//virtual bool hasCollisionWith(Obstacle* obstacle);
+	//virtual void react(Flag* flag);
+
 	// Добавить поведение при столкновении
 	// Например, сдуться в эллипс при столкновении с флагом 
 	// и стать вертикальным эллипсом при столкновении с диском
 };
+
+
+/**********************************************************
+*					ПРОТОТИПЫ ФУНКЦИЙ					  *
+**********************************************************/
+
+void OperateWith(Fish* fish);
+void ClearScreen();
