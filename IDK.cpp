@@ -19,52 +19,52 @@
 using namespace std;
 
 int PEN_WIDTH = 1;  // Толщина пера
-int PPM = 40;		// Pixels Per Move
+//int PPM = 40;		// Pixels Per Move
 
 HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
 HDC hdc = GetDC(hWnd);
 
-// Параметры рыбы
-int BODY_FOCUS_X = 100;
-int BODY_FOCUS_Y = 40;
-int REAR_FIN_HEIGHT = 70;
-int REAR_FIN_BASE = 100;
-int TOP_FIN_HEIGHT = 50;
-int TOP_FIN_BASE = 60;
-int BOTTOM_FIN_HEIGHT = -50;
-int BOTTOM_FIN_BASE = -60;
-int EYE_RADIUS = 7;
-int MOUTH_HEIGHT = -30;
-int MOUTH_BASE = -8;
+//// Параметры рыбы
+//int BODY_FOCUS_X = 100;
+//int BODY_FOCUS_Y = 40;
+//int REAR_FIN_HEIGHT = 70;
+//int REAR_FIN_BASE = 100;
+//int TOP_FIN_HEIGHT = 50;
+//int TOP_FIN_BASE = 60;
+//int BOTTOM_FIN_HEIGHT = -50;
+//int BOTTOM_FIN_BASE = -60;
+//int EYE_RADIUS = 7;
+//int MOUTH_HEIGHT = -30;
+//int MOUTH_BASE = -8;
 
 /**********************************************************
 *					РЕАЛИЗАЦИЯ ФУНКЦИЙ					  *
 **********************************************************/
 
-// Работа с любой рыбой через указатель на базовый класс
-void OperateWith(Fish* fish) {
-	bool EXIT_TASK = false;
-	while (!EXIT_TASK) {
-		cout << "Выберите действие над базовой рыбой: \n"
-			<< "1 - Показать на экране\n"
-			<< "2 - Скрыть\n"
-			<< "3 - Перемещать\n"
-			<< "Другая цифра - Вернуться на главную\n";
-		int choice;
-		cin >> choice;
-		system("cls"); // очистка консоли
-		switch (choice) {
-		case 1: { fish->Show();    break; }
-		case 2: { fish->Hide();    break; }
-		case 3: { fish->drag(PPM); break; }
-		default: {
-			EXIT_TASK = true;
-			cout << "Возращаем...\n";
-			break;
-		}
-		}
-	}
-}
+// Работа с любой рыбой через указатель на базовый класс(бесполезно без вирт.функций)
+//void OperateWith(Fish* fish) {
+//	bool EXIT_TASK = false;
+//	while (!EXIT_TASK) {
+//		cout << "Выберите действие над базовой рыбой: \n"
+//			<< "1 - Показать на экране\n"
+//			<< "2 - Скрыть\n"
+//			<< "3 - Перемещать\n"
+//			<< "Другая цифра - Вернуться на главную\n";
+//		int choice;
+//		cin >> choice;
+//		system("cls"); // очистка консоли
+//		switch (choice) {
+//		case 1: { fish->Show();    break; }
+//		case 2: { fish->Hide();    break; }
+//		case 3: { fish->drag(PPM); break; }
+//		default: {
+//			EXIT_TASK = true;
+//			cout << "Возращаем...\n";
+//			break;
+//		}
+//		}
+//	}
+//}
 
 // Очистка экрана консоли
 void ClearScreen() {
@@ -141,7 +141,20 @@ void Point::drag(int step) {
 *				МЕТОДЫ КЛАССА Fish						  *
 **********************************************************/
 
-Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {}
+Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {
+	// Параметры рыбы
+	BODY_FOCUS_X = 100;
+	BODY_FOCUS_Y = 40;
+	REAR_FIN_HEIGHT = 70;
+	REAR_FIN_BASE = 100;
+	TOP_FIN_HEIGHT = 50;
+	TOP_FIN_BASE = 60;
+	BOTTOM_FIN_HEIGHT = -50;
+	BOTTOM_FIN_BASE = -60;
+	EYE_RADIUS = 7;
+	MOUTH_HEIGHT = -30;
+	MOUTH_BASE = -8;
+}
 Fish::~Fish() {}
 
 // Рисование тела рыбы
