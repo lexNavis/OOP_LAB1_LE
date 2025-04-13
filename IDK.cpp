@@ -24,18 +24,6 @@ int PEN_WIDTH = 1;  // “олщина пера
 HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
 HDC hdc = GetDC(hWnd);
 
-//// ѕараметры рыбы
-//int BODY_FOCUS_X = 100;
-//int BODY_FOCUS_Y = 40;
-//int REAR_FIN_HEIGHT = 70;
-//int REAR_FIN_BASE = 100;
-//int TOP_FIN_HEIGHT = 50;
-//int TOP_FIN_BASE = 60;
-//int BOTTOM_FIN_HEIGHT = -50;
-//int BOTTOM_FIN_BASE = -60;
-//int EYE_RADIUS = 7;
-//int MOUTH_HEIGHT = -30;
-//int MOUTH_BASE = -8;
 
 /**********************************************************
 *					–≈јЋ»«ј÷»я ‘”Ќ ÷»…					  *
