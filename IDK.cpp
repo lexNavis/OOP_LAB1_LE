@@ -323,7 +323,7 @@ void HatFish::Hide() {
 
 	visible = false;
 }
-void Fish::moveTo(int new_x, int new_y) {
+void HatFish::moveTo(int new_x, int new_y) {
 	Hide();
 	// ѕеремещение "центра" в новое место
 	setX(new_x);
@@ -332,7 +332,7 @@ void Fish::moveTo(int new_x, int new_y) {
 }
 
 // ѕродолжительное движение с заданным шагом
-void Fish::drag(int step) {
+void HatFish::drag(int step) {
 	while (1) {
 		Hide(); //«атирка прив€зана к текущим координатам, заранее стираем объект до изменени€ координаты
 		// ќбработка нажати€ клавиш - выбор направлени€
