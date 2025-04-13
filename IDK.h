@@ -90,6 +90,19 @@ public:
 
 // Базовый класс, описывающий рыбу
 class Fish : public Point {
+protected:
+	// Параметры рыбы
+	int BODY_FOCUS_X;
+	int BODY_FOCUS_Y;
+	int REAR_FIN_HEIGHT;
+	int REAR_FIN_BASE;
+	int TOP_FIN_HEIGHT;
+	int TOP_FIN_BASE;
+	int BOTTOM_FIN_HEIGHT;
+	int BOTTOM_FIN_BASE;
+	int EYE_RADIUS;
+	int MOUTH_HEIGHT;
+	int MOUTH_BASE;
 public:
 	Fish(int new_x, int new_y);
 	~Fish();
@@ -182,5 +195,5 @@ public:
 *					ПРОТОТИПЫ ФУНКЦИЙ					  *
 **********************************************************/
 
-void OperateWith(Fish* fish);
+//void OperateWith(Fish* fish);
 void ClearScreen();
