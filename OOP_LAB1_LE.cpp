@@ -20,8 +20,8 @@
 
 using namespace std;
 
-//int PPM = 40; //Pixels Per Move
-//bool EXIT_TASK = false; //to break infinite loops
+int PPM = 40; //Pixels Per Move
+bool EXIT_TASK = false; //to break infinite loops
 
 int main() {
     setlocale(LC_ALL, "RUSSIAN");
@@ -29,7 +29,7 @@ int main() {
     int x = 0, y = 0;
     while (1)
     {
-        //EXIT_TASK = false;
+        EXIT_TASK = false;
         cout << "Выберите действие: \n"
             << "1 - Создать базовую рыбу\n"
             << "2 - Создать рыбу с шляпой\n"
@@ -43,8 +43,8 @@ int main() {
             cout << "Введите координаты (x,y): \n";
             cin >> x >> y;
             Fish AFish(x, y);
-            OperateWith(&AFish);
-            /*while (!EXIT_TASK) {
+            //OperateWith(&AFish);
+            while (!EXIT_TASK) {
                 cout << "Выберите действие над базовой рыбой: \n"
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
@@ -62,7 +62,7 @@ int main() {
                     break;
                 }
                 }
-            }*/
+            }
             break;
         }
 
@@ -70,8 +70,8 @@ int main() {
             cout << "Введите координаты (x,y): \n";
             cin >> x >> y;
             HatFish BFish(x, y);
-            OperateWith(&BFish);
-            /*while (!EXIT_TASK) {
+            //OperateWith(&BFish);
+            while (!EXIT_TASK) {
                 cout << "Выберите действие над рыбой - патриотом: \n"
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
@@ -89,15 +89,15 @@ int main() {
                     break;
                 }
                 }
-            }*/
+            }
             break;
         }
         case 3: {
             cout << "Введите координаты (x,y): \n";
             cin >> x >> y;
             MutantFish CFish(x, y);
-            OperateWith(&CFish);
-            /*while (!EXIT_TASK) {
+            //OperateWith(&CFish);
+            while (!EXIT_TASK) {
                 cout << "Выберите действие над диско-рыбой: \n"
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
@@ -115,15 +115,15 @@ int main() {
                     break;
                 }
                 }
-            }*/
+            }
             break;
         }
         case 4: {
             cout << "Введите координаты (x,y): \n";
             cin >> x >> y;
             CircleFish DFish(x, y);
-            OperateWith(&DFish);
-            /*while (!EXIT_TASK) {
+            //OperateWith(&DFish);
+            while (!EXIT_TASK) {
                 cout << "Выберите действие над диско-рыбой: \n"
                     << "1 - Показать на экране\n"
                     << "2 - Скрыть\n"
@@ -141,7 +141,7 @@ int main() {
                     break;
                 }
                 }
-            }*/
+            }
             break;
         }
         case 5: {
