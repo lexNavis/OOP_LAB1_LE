@@ -24,19 +24,6 @@ int PPM = 40;		// Pixels Per Move
 HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
 HDC hdc = GetDC(hWnd);
 
-// Параметры рыбы
-int BODY_FOCUS_X = 100;
-int BODY_FOCUS_Y = 40;
-int REAR_FIN_HEIGHT = 70;
-int REAR_FIN_BASE = 100;
-int TOP_FIN_HEIGHT = 50;
-int TOP_FIN_BASE = 60;
-int BOTTOM_FIN_HEIGHT = -50;
-int BOTTOM_FIN_BASE = -60;
-int EYE_RADIUS = 7;
-int MOUTH_HEIGHT = -30;
-int MOUTH_BASE = -8;
-
 /**********************************************************
 *					РЕАЛИЗАЦИЯ ФУНКЦИЙ					  *
 **********************************************************/
@@ -141,7 +128,20 @@ void Point::drag(int step) {
 *				МЕТОДЫ КЛАССА Fish						  *
 **********************************************************/
 
-Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {}
+Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {
+	// Параметры рыбы
+	BODY_FOCUS_X = 100;
+	BODY_FOCUS_Y = 40;
+	REAR_FIN_HEIGHT = 70;
+	REAR_FIN_BASE = 100;
+	TOP_FIN_HEIGHT = 50;
+	TOP_FIN_BASE = 60;
+	BOTTOM_FIN_HEIGHT = -50;
+	BOTTOM_FIN_BASE = -60;
+	EYE_RADIUS = 7;
+	MOUTH_HEIGHT = -30;
+	MOUTH_BASE = -8;
+}
 Fish::~Fish() {}
 
 // Рисование тела рыбы
