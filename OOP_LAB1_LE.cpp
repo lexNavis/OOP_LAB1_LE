@@ -35,7 +35,8 @@ int main() {
             << "2 - Создать рыбу с шляпой\n"
             << "3 - Создать рыбу с двумя глазами \n"
             << "4 - Создать рыбу - шар \n"
-            << "5 - Очистить экран \n";
+            << "5 - Столкновения \n" 
+            << "6 - Очистить экран \n";
         int choice;
         cin >> choice;
         switch (choice) {
@@ -145,6 +146,10 @@ int main() {
             break;
         }
         case 5: {
+            demonstrate_collisions();
+            break;
+        }
+        case 6: {
             ClearScreen();
             break;
         }
