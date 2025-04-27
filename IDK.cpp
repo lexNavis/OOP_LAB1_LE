@@ -53,6 +53,27 @@ void OperateWith(Fish* fish) {
 	}
 }
 
+// Демонстрируем реакцию разных рыб на столкновение с препятствиями
+void demonstrate_collisions() {
+
+	const int FISH_COUNT = 3;
+
+	HatFish		HFish(300, 300);
+	MutantFish	MFish(700, 300);
+	CircleFish	CFish(1000, 300);
+
+	// Массив со всеми существующими рыбами 
+	Fish* Fishes[FISH_COUNT] = { &HFish, &MFish, &CFish };
+	// Указатель на конкретную рыбу 
+	Fish* pFish = nullptr;
+
+	for (int i = 0; i < FISH_COUNT; i++) {
+		pFish = *(Fishes + i);
+		pFish->drag(PPM);
+	}
+
+}
+
 // Очистка экрана консоли
 void ClearScreen() {
 	HWND hWnd = FindWindowA("ConsoleWindowClass", NULL);
@@ -109,20 +130,71 @@ void Point::moveTo(int new_x, int new_y) {
 	Show();
 }
 
+bool Point::hasCollisionWith(Obstacle* obstacle) { return false; }
+
+void Point::react(Flag* flag) {}
+void Point::react(Disc* Disc) {}
+void Point::react(Brick* brick) {}
+
 // Продолжительное движение с заданным шагом
+//void Point::drag(int step) {
+//	while (1) {
+//		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+//		// Обработка нажатия клавиш - выбор направления
+//		if (KEY_DOWN(VK_ESCAPE)) break;
+//		else if (KEY_DOWN(VK_LEFT))  x = x - step;
+//		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
+//		else if (KEY_DOWN(VK_UP))    y = y - step;
+//		else if (KEY_DOWN(VK_DOWN))  y = y + step;
+//		moveTo(x, y);
+//		Sleep(200);
+//	}
+//}
+
 void Point::drag(int step) {
+	Flag AFlag(700, 700, 80, 30);
+	Disc ADisc(300, 700, 80, 80);
+	Brick ABrick(1000, 700, 80, 30);
+
+	AFlag.Show();
+	ADisc.Show();
+	ABrick.Show();
+
 	while (1) {
 		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
-		// Обработка нажатия клавиш - выбор направления
 		if (KEY_DOWN(VK_ESCAPE)) break;
 		else if (KEY_DOWN(VK_LEFT))  x = x - step;
 		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
 		else if (KEY_DOWN(VK_UP))    y = y - step;
 		else if (KEY_DOWN(VK_DOWN))  y = y + step;
 		moveTo(x, y);
-		Sleep(200);
+		if (hasCollisionWith(&AFlag)) {
+			cout << "Collided with Flag!\n";
+			react(&AFlag);
+			Sleep(2000);
+			ClearScreen();
+			break;
+		}
+		if (hasCollisionWith(&ADisc)) {
+			cout << "Collided with Disc\n";
+			react(&ADisc);
+			Sleep(2000);
+			ClearScreen();
+			break;
+		}
+		if (hasCollisionWith(&ABrick)) {
+			cout << "Collided with Brick\n";
+			react(&ABrick);
+			Sleep(2000);
+			ClearScreen();
+			break;
+		}
+		Sleep(200);//чтоб эпилепсии не было
 	}
 }
+
+
+
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА Fish						  *
@@ -209,6 +281,8 @@ void Fish::top_fin(int clr1, int clr2, int clr3) {
 	DeleteObject(hBrush);
 	delete[] points;
 }
+
+// Рисование глаза
 void Fish::eye(int clr1, int clr2, int clr3) {
 	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
@@ -222,8 +296,10 @@ void Fish::eye(int clr1, int clr2, int clr3) {
 	);
 	DeleteObject(hBrush);
 }
+
+// Рисование рта
 void Fish::mouth(int clr1, int clr2, int clr3) {
-	//mouth = new Triangle(new_x + f1 - 20, new_y + 10, -30, -8);
+	
 	POINT* points = new POINT[3];
 	points[0] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y - MOUTH_BASE / 2 + 10 };
 	points[1] = { x - MOUTH_HEIGHT / 2 + BODY_FOCUS_X - 20, y + MOUTH_BASE / 2 + 10 };
@@ -257,6 +333,38 @@ void Fish::Hide() {
 	visible = false;
 }
 
+bool Fish::hasCollisionWith(Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
+
+void Fish::react(Flag* flag) {}
+void Fish::react(Disc* disc) {}
+void Fish::react(Brick* brick) {}
+
 /**********************************************************
 *				МЕТОДЫ КЛАССА HatFish					  *
 **********************************************************/
@@ -273,6 +381,53 @@ void HatFish::hat(int clr1, int clr2, int clr3) {
 		y - BODY_FOCUS_Y - 15,
 		x + 80,
 		y - BODY_FOCUS_Y + 15
+	);
+	DeleteObject(hBrush);
+}
+
+// Рисование поднятой шляпы
+void HatFish::hat_up(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,	//focusX = 80, focusY = 15
+		x - 80,
+		y - BODY_FOCUS_Y - 15 - 40, //подъем на 20 пикселей
+		x + 80,
+		y - BODY_FOCUS_Y + 15 - 40
+	);
+	DeleteObject(hBrush);
+}
+
+void HatFish::crown(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Rectangle(
+		hdc, 
+		x - 80,
+		y - BODY_FOCUS_Y - 15,
+		x + 80,
+		y - BODY_FOCUS_Y + 15
+	);
+	Rectangle(
+		hdc,
+		x - 80,
+		y - BODY_FOCUS_Y - 60,
+		x - 40,
+		y - BODY_FOCUS_Y - 15
+	);
+	Rectangle(
+		hdc,
+		x - 20,
+		y - BODY_FOCUS_Y - 60,
+		x + 20,
+		y - BODY_FOCUS_Y - 15
+	);
+	Rectangle(
+		hdc, 
+		x + 40,
+		y - BODY_FOCUS_Y - 60,
+		x + 80,
+		y - BODY_FOCUS_Y - 15
 	);
 	DeleteObject(hBrush);
 }
@@ -303,6 +458,67 @@ void HatFish::Hide() {
 	visible = false;
 }
 
+bool HatFish::hasCollisionWith(Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
+
+void HatFish::react(Flag* flag) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+	hat_up(255, 0, 0);
+}
+
+void HatFish::react(Disc* disc) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+	crown(255, 255, 0);
+}
+
+void HatFish::react(Brick* brick) {
+	rear_fin(126, 52, 26);
+	top_fin(126, 52, 26);
+	bottom_fin(126, 52, 26);
+	body(126, 52, 26);
+	eye(0, 0, 0);
+	mouth(126, 52, 26);
+	// Отличие предка от потомка - наличие шляпы
+	hat(126, 52, 26);
+}
+
 /**********************************************************
 *				МЕТОДЫ КЛАССА MutantFish				  *
 **********************************************************/
@@ -319,6 +535,18 @@ void MutantFish::second_eye(int clr1, int clr2, int clr3) {
 		y - EYE_RADIUS - 10,
 		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 20,
 		y + EYE_RADIUS - 10
+	);
+	DeleteObject(hBrush);
+}
+
+void MutantFish::third_eye(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,	//focusX = 80, focusY = 15
+		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 10,
+		y - EYE_RADIUS - 20,
+		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 10,
+		y + EYE_RADIUS - 20
 	);
 	DeleteObject(hBrush);
 }
@@ -348,6 +576,65 @@ void MutantFish::Hide() {
 	visible = false;
 }
 
+bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
+
+void MutantFish::react(Flag* flag) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	// Отличие предка от потомка - наличие второго глаза
+	second_eye(0, 0, 0);
+	third_eye(0, 0, 0);
+	mouth(169, 169, 169);
+}
+
+void MutantFish::react(Disc* disc) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	mouth(169, 169, 169);
+}
+
+void MutantFish::react(Brick* brick) {
+	Hide();
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	// Отличие предка от потомка - наличие второго глаза
+	second_eye(0, 0, 0);
+	mouth(169, 169, 169);
+}
+
 /**********************************************************
 *				МЕТОДЫ КЛАССА CircleFish				  *
 **********************************************************/
@@ -357,6 +644,15 @@ CircleFish::~CircleFish() {}
 
 // Переопределение метода тела рыбы, так как форма не эллипс, а шар
 void CircleFish::body(int clr1, int clr2, int clr3) {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hPen);
 	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
 	SelectObject(hdc, hBrush);
 	Ellipse(hdc,
@@ -393,6 +689,49 @@ void CircleFish::top_fin(int clr1, int clr2, int clr3) {
 	delete[] points;
 }
 
+void CircleFish::slim_body(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_Y,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_Y
+	);
+	DeleteObject(hBrush);
+}
+void CircleFish::fat_body(int clr1, int clr2, int clr3) {
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X - 16,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X + 16
+	);
+	DeleteObject(hBrush);
+}
+void CircleFish::square_body(int clr1, int clr2, int clr3) {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hPen);
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hBrush);
+}
+
 // Переопределение родительских методов Show и Hide
 void CircleFish::Show() {
 	rear_fin(169, 169, 169);
@@ -415,6 +754,60 @@ void CircleFish::Hide() {
 	visible = false;
 }
 
+void CircleFish::react(Flag* flag) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	slim_body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+}
+void CircleFish::react(Disc* disc) {
+	Hide();
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	fat_body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+}
+void CircleFish::react(Brick* brick) {
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	square_body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+}
+
+bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_X - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_X + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
 
 
 
@@ -457,315 +850,153 @@ void CircleFish::Hide() {
 *					Реакционные изменения рыб					*
 ****************************************************************/
 
-//void HatFish::hat_up() {
-//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0)); //салатовый
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc,	//focusX = 80, focusY = 15
-//		x - 80,
-//		y - BODY_FOCUS_Y - 15 - 20, //подъем на 20 пикселей
-//		x + 80,
-//		y - BODY_FOCUS_Y + 15 - 20
-//	);
-//	DeleteObject(hBrush);
-//}
 
-//void MutantFish::third_eye() {
-//	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 0)); //салатовый
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc,	//focusX = 80, focusY = 15
-//		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 10,
-//		y - EYE_RADIUS - 20,
-//		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 10,
-//		y + EYE_RADIUS - 20
-//	);
-//	DeleteObject(hBrush);
-//}
-
-//void CircleFish::slim_body() {
-//	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc,
-//		x - BODY_FOCUS_X,
-//		y - BODY_FOCUS_Y,
-//		x + BODY_FOCUS_X,
-//		y + BODY_FOCUS_Y
-//	);
-//	DeleteObject(hBrush);
-//}
-//
-//void CircleFish::fat_body() {
-//	HBRUSH hBrush = CreateSolidBrush(RGB(127, 255, 0)); //салатовый
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc,
-//		x - BODY_FOCUS_X,
-//		y - BODY_FOCUS_X - 16,
-//		x + BODY_FOCUS_X,
-//		y + BODY_FOCUS_X + 16
-//	);
-//	DeleteObject(hBrush);
-//}
 
 /****************************************************************
 *		Проверка на столкновение и реакция на него всех рыб		*
 ****************************************************************/
 
-//bool Fish::hasCollisionWith(Obstacle* obstacle) {
-//	// Параметры препятствия
-//	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
-//		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
-//	// Коориднаты лев.верх и правого нижнего угла грани рыбы
-//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-//		x2 = x + BODY_FOCUS_X,
-//		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-//		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
-//
-//	if (
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		)
-//		return true;
-//	else
-//		return false;
-//}
-//
-//void Fish::react(Flag* flag) {}
 
-//bool HatFish::hasCollisionWith(Obstacle* obstacle) {
-//	// Параметры препятствия
-//	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
-//		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
-//	// Коориднаты лев.верх и правого нижнего угла грани рыбы
-//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-//		x2 = x + BODY_FOCUS_X,
-//		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-//		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
-//
-//	if (
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		)
-//		return true;
-//	else
-//		return false;
-//}
-//
-//void HatFish::react(Flag* flag) {
-//	Hide();
-//	rear_fin();
-//	top_fin();
-//	bottom_fin();
-//	body();
-//	eye();
-//	mouth();
-//	hat_up();
-//}
-
-//bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
-//	// Параметры препятствия
-//	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
-//		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
-//	// Коориднаты лев.верх и правого нижнего угла грани рыбы
-//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-//		x2 = x + BODY_FOCUS_X,
-//		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-//		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
-//
-//	if (
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		)
-//		return true;
-//	else
-//		return false;
-//}
-//
-//void MutantFish::react(Flag* flag) {
-//	Hide();
-//	rear_fin();
-//	top_fin();
-//	bottom_fin();
-//	body();
-//	eye();
-//	second_eye();
-//	third_eye();
-//	mouth();
-//}
-
-//void CircleFish::react(Flag* flag) {
-//	Hide();
-//	rear_fin();
-//	top_fin();
-//	bottom_fin();
-//	slim_body();
-//	eye();
-//	mouth();
-//}
-//
-//bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
-//	// Параметры препятствия
-//	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
-//		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
-//	// Коориднаты лев.верх и правого нижнего угла грани рыбы
-//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-//		x2 = x + BODY_FOCUS_X,
-//		y1 = y - BODY_FOCUS_X - 15 - abs(TOP_FIN_BASE) / 2,
-//		y2 = y + BODY_FOCUS_X + 15 + abs(BOTTOM_FIN_BASE) / 2;
-//
-//	if (
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
-//		||
-//		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
-//			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
-//		)
-//		return true;
-//	else
-//		return false;
-//}
 
 /****************************************************************
 *					Методы препятствий							*
 ****************************************************************/
 
-////defining Obstacle methods
-//Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Point(new_x, new_y) {
-//	size_x = new_szX;
-//	size_y = new_szY;
-//}
-//Obstacle::~Obstacle() {}
-////void Obstacle::Show() {}
-////void Obstacle::Hide() {}
-//int  Obstacle::getsizeX() { return size_x; }
-//int  Obstacle::getsizeY() { return size_y; }
-//void Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
-//void Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
+//defining Obstacle methods
+Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
+	size_x = new_szX;
+	size_y = new_szY;
+}
+Obstacle::~Obstacle() {}
+void Obstacle::Show() {}
+void Obstacle::Hide() {}
+int  Obstacle::getsizeX() { return size_x; }
+int  Obstacle::getsizeY() { return size_y; }
+void Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
+void Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
 
-////defining Flag methods
-//Flag::Flag(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
-//
-//}
-//Flag::~Flag() {}
-//void Flag::Show() {
-//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(0, 0, 0));
-//	SelectObject(hdc, hPen);
-//	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
-//	DeleteObject(hPen);
-//
-//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
-//	SelectObject(hdc, hBrush);
-//	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y - size_y / 6);
-//	hBrush = CreateSolidBrush(RGB(0, 0, 255));
-//	SelectObject(hdc, hBrush);
-//	Rectangle(hdc, x - size_x / 2, y - size_y / 6, x + size_x / 2, y + size_y / 6);
-//	hBrush = CreateSolidBrush(RGB(255, 0, 0));
-//	SelectObject(hdc, hBrush);
-//	Rectangle(hdc, x - size_x / 2, y + size_y / 6, x + size_x / 2, y + size_y / 2);
-//	DeleteObject(hBrush);
-//
-//	visible = true;
-//}
-//void Flag::Hide() {
-//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-//	SelectObject(hdc, hPen);
-//	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
-//	DeleteObject(hPen);
-//
-//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
-//	SelectObject(hdc, hBrush);
-//	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
-//	DeleteObject(hBrush);
-//
-//	visible = false;
-//}
+//defining Flag methods
+Flag::Flag(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
 
-// Disc methods
-//Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
-//
-//}
-//Disc::~Disc() {}
-//void Disc::Show() {
-//
-//	//border of first circle
-//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(0, 0, 0)); SelectObject(hdc, hPen);
-//	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
-//
-//	//inner part of first circle
-//	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 139));
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
-//	DeleteObject(hBrush);
-//
-//	//border of second circle
-//	SelectObject(hdc, hPen);
-//	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
-//
-//	//inner part of second circle
-//	hBrush = CreateSolidBrush(RGB(90, 90, 90));
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
-//	DeleteObject(hBrush);
-//
-//	//border of third circle
-//	SelectObject(hdc, hPen);
-//	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
-//
-//	//inner part of third circle
-//	hBrush = CreateSolidBrush(RGB(0, 0, 255));
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
-//	DeleteObject(hBrush);
-//
-//	DeleteObject(hPen);
-//
-//	visible = true;
-//
-//}
-//void Disc::Hide() {
-//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(255, 255, 255));
-//	SelectObject(hdc, hPen);
-//	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
-//	DeleteObject(hPen);
-//
-//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
-//	SelectObject(hdc, hBrush);
-//	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
-//	DeleteObject(hBrush);
-//
-//	visible = false;
-//}
+}
+Flag::~Flag() {}
+void Flag::Show() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(0, 0, 0));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y - size_y / 6);
+	hBrush = CreateSolidBrush(RGB(0, 0, 255));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 6, x + size_x / 2, y + size_y / 6);
+	hBrush = CreateSolidBrush(RGB(255, 0, 0));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y + size_y / 6, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//visible = true;
+}
+void Flag::Hide() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//visible = false;
+}
+
+//Disc methods
+Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
+
+}
+Disc::~Disc() {}
+void Disc::Show() {
+
+	//border of first circle
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(0, 0, 0)); SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+
+	//inner part of first circle
+	HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 139));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//border of second circle
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
+
+	//inner part of second circle
+	hBrush = CreateSolidBrush(RGB(90, 90, 90));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 4, y - size_y / 4, x + size_y / 4, y + size_y / 4);
+	DeleteObject(hBrush);
+
+	//border of third circle
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
+
+	//inner part of third circle
+	hBrush = CreateSolidBrush(RGB(0, 0, 255));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 8, y - size_y / 8, x + size_y / 8, y + size_y / 8);
+	DeleteObject(hBrush);
+
+	DeleteObject(hPen);
+}
+void Disc::Hide() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH + 1, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc, x - size_x / 2, y - size_y / 2, x + size_y / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+}
+
+
+// Brick methods
+Brick::Brick(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
+
+}
+Brick::~Brick() {}
+void Brick::Show() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(0, 0, 0));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	hBrush = CreateSolidBrush(RGB(126, 52, 26));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//visible = true;
+}
+void Brick::Hide() {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hPen);
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255));
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
+	DeleteObject(hBrush);
+
+	//visible = false;
+}
 
 /****************************************************************
 *							Остальное							*
@@ -786,3 +1017,4 @@ void CircleFish::Hide() {
 //	DeleteObject(hBrush);
 //	DeleteObject(hPen);
 //}
+
