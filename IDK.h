@@ -95,7 +95,7 @@ public:
 	virtual void Hide();
 
 	void moveTo(int new_x, int new_y);
-	void drag(int step);
+	int drag(int step);
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
 	virtual void react(Flag* flag);
@@ -149,16 +149,12 @@ public:
 
 	// Объявление уникальных методов - шляпы и поднятой шляпы
 	void hat(int clr1, int clr2, int clr3);
-	void hat_up(int clr1, int clr2, int clr3);
-	void crown(int clr1, int clr2, int clr3);
 
 	virtual void Show();
 	virtual void Hide();
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-	virtual void react(Disc* disc);
-	virtual void react(Brick* brick);
+	
 	// Добавить поведение при столкновении
 	// Например, поднимать шляпу при столкновении с флагом 
 	// и менять шляпу на корону при столкновении с диском
@@ -172,15 +168,12 @@ public:
 
 	// Объявление уникальных методов - второго глаза и третьего глаза
 	void second_eye(int clr1, int clr2, int clr3);
-	void third_eye(int clr1, int clr2, int clr3);
 
 	virtual void Show();
 	virtual void Hide();
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-	virtual void react(Disc* disc);
-	virtual void react(Brick* brick);
+
 	// Добавить поведение при столкновении 
 	// Например, добавить третий глаз при столкновении с флагом 
 	// и лишить глаз вообще при столкновении с диском
@@ -192,9 +185,6 @@ public:
 	CircleFish(int new_x, int new_y);
 	~CircleFish();
 	// Объявление уникальных методов - круглого, утонченного и утолщенного тел, иного положения плавников
-	void body(int clr1, int clr2, int clr3);
-	void slim_body(int clr1, int clr2, int clr3);
-	void fat_body(int clr1, int clr2, int clr3);
 	void square_body(int clr1, int clr2, int clr3);
 	void bottom_fin(int clr1, int clr2, int clr3);
 	void top_fin(int clr1, int clr2, int clr3);
@@ -203,9 +193,7 @@ public:
 	virtual void Hide();
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-	virtual void react(Disc* disc);
-	virtual void react(Brick* brick);
+	
 
 	// Добавить поведение при столкновении
 	// Например, сдуться в эллипс при столкновении с флагом 
@@ -220,3 +208,5 @@ public:
 void OperateWith(Fish* fish);
 void demonstrate_collisions();
 void ClearScreen();
+
+Fish* setFish(Fish** fishes, int pos);

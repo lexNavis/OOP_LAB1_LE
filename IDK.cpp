@@ -43,7 +43,7 @@ void OperateWith(Fish* fish) {
 		switch (choice) {
 		case 1: { fish->Show();    break; }
 		case 2: { fish->Hide();    break; }
-		case 3: { fish->drag(PPM); break; }
+		//case 3: { fish->drag(PPM); break; }
 		default: {
 			EXIT_TASK = true;
 			cout << "Возращаем...\n";
@@ -54,24 +54,31 @@ void OperateWith(Fish* fish) {
 }
 
 // Демонстрируем реакцию разных рыб на столкновение с препятствиями
+
 void demonstrate_collisions() {
 
-	const int FISH_COUNT = 3;
-
+	const int FISH_COUNT = 4;
+	Fish		BFish(300, 300);
 	HatFish		HFish(300, 300);
-	MutantFish	MFish(700, 300);
-	CircleFish	CFish(1000, 300);
+	MutantFish	MFish(300, 300);
+	CircleFish	CFish(300, 300);
 
 	// Массив со всеми существующими рыбами 
-	Fish* Fishes[FISH_COUNT] = { &HFish, &MFish, &CFish };
+	Fish* fishes[FISH_COUNT] = { &BFish, &HFish, &MFish, &CFish };
 	// Указатель на конкретную рыбу 
 	Fish* pFish = nullptr;
+	
+	int k = 0;
 
-	for (int i = 0; i < FISH_COUNT; i++) {
-		pFish = *(Fishes + i);
-		pFish->drag(PPM);
+	while(1) {
+		pFish = setFish(fishes, k);
+		k = pFish->drag(PPM);
 	}
 
+}
+
+Fish* setFish(Fish** fishes, int pos) {
+	return *(fishes + pos);
 }
 
 // Очистка экрана консоли
@@ -137,21 +144,8 @@ void Point::react(Disc* Disc) {}
 void Point::react(Brick* brick) {}
 
 // Продолжительное движение с заданным шагом
-//void Point::drag(int step) {
-//	while (1) {
-//		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
-//		// Обработка нажатия клавиш - выбор направления
-//		if (KEY_DOWN(VK_ESCAPE)) break;
-//		else if (KEY_DOWN(VK_LEFT))  x = x - step;
-//		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
-//		else if (KEY_DOWN(VK_UP))    y = y - step;
-//		else if (KEY_DOWN(VK_DOWN))  y = y + step;
-//		moveTo(x, y);
-//		Sleep(200);
-//	}
-//}
 
-void Point::drag(int step) {
+int Point::drag(int step) {
 	Flag AFlag(700, 700, 80, 30);
 	Disc ADisc(300, 700, 80, 80);
 	Brick ABrick(1000, 700, 80, 30);
@@ -162,7 +156,7 @@ void Point::drag(int step) {
 
 	while (1) {
 		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
-		if (KEY_DOWN(VK_ESCAPE)) break;
+		if (KEY_DOWN(VK_ESCAPE)) return 0;
 		else if (KEY_DOWN(VK_LEFT))  x = x - step;
 		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
 		else if (KEY_DOWN(VK_UP))    y = y - step;
@@ -170,24 +164,25 @@ void Point::drag(int step) {
 		moveTo(x, y);
 		if (hasCollisionWith(&AFlag)) {
 			cout << "Collided with Flag!\n";
-			react(&AFlag);
-			Sleep(2000);
+			Sleep(200);
 			ClearScreen();
-			break;
+			// Вернем рыбу на свое место
+			setX(300); setY(300);
+			return 1;
 		}
 		if (hasCollisionWith(&ADisc)) {
 			cout << "Collided with Disc\n";
-			react(&ADisc);
-			Sleep(2000);
+			Sleep(200);
 			ClearScreen();
-			break;
+			setX(300); setY(300);
+			return 2;
 		}
 		if (hasCollisionWith(&ABrick)) {
 			cout << "Collided with Brick\n";
-			react(&ABrick);
-			Sleep(2000);
+			Sleep(200);
 			ClearScreen();
-			break;
+			setX(300); setY(300);
+			return 3;
 		}
 		Sleep(200);//чтоб эпилепсии не было
 	}
@@ -385,53 +380,6 @@ void HatFish::hat(int clr1, int clr2, int clr3) {
 	DeleteObject(hBrush);
 }
 
-// Рисование поднятой шляпы
-void HatFish::hat_up(int clr1, int clr2, int clr3) {
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Ellipse(hdc,	//focusX = 80, focusY = 15
-		x - 80,
-		y - BODY_FOCUS_Y - 15 - 40, //подъем на 20 пикселей
-		x + 80,
-		y - BODY_FOCUS_Y + 15 - 40
-	);
-	DeleteObject(hBrush);
-}
-
-void HatFish::crown(int clr1, int clr2, int clr3) {
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Rectangle(
-		hdc,
-		x - 80,
-		y - BODY_FOCUS_Y - 15,
-		x + 80,
-		y - BODY_FOCUS_Y + 15
-	);
-	Rectangle(
-		hdc,
-		x - 80,
-		y - BODY_FOCUS_Y - 60,
-		x - 40,
-		y - BODY_FOCUS_Y - 15
-	);
-	Rectangle(
-		hdc,
-		x - 20,
-		y - BODY_FOCUS_Y - 60,
-		x + 20,
-		y - BODY_FOCUS_Y - 15
-	);
-	Rectangle(
-		hdc,
-		x + 40,
-		y - BODY_FOCUS_Y - 60,
-		x + 80,
-		y - BODY_FOCUS_Y - 15
-	);
-	DeleteObject(hBrush);
-}
-
 // Переопределение родительских методов Show и Hide
 void HatFish::Show() {
 	rear_fin(169, 169, 169);
@@ -486,38 +434,6 @@ bool HatFish::hasCollisionWith(Obstacle* obstacle) {
 		return false;
 }
 
-void HatFish::react(Flag* flag) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	body(127, 255, 0);
-	eye(0, 0, 0);
-	mouth(169, 169, 169);
-	hat_up(255, 0, 0);
-}
-
-void HatFish::react(Disc* disc) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	body(127, 255, 0);
-	eye(0, 0, 0);
-	mouth(169, 169, 169);
-	crown(255, 255, 0);
-}
-
-void HatFish::react(Brick* brick) {
-	rear_fin(126, 52, 26);
-	top_fin(126, 52, 26);
-	bottom_fin(126, 52, 26);
-	body(126, 52, 26);
-	eye(0, 0, 0);
-	mouth(126, 52, 26);
-	// Отличие предка от потомка - наличие шляпы
-	hat(126, 52, 26);
-}
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА MutantFish				  *
@@ -535,18 +451,6 @@ void MutantFish::second_eye(int clr1, int clr2, int clr3) {
 		y - EYE_RADIUS - 10,
 		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 20,
 		y + EYE_RADIUS - 10
-	);
-	DeleteObject(hBrush);
-}
-
-void MutantFish::third_eye(int clr1, int clr2, int clr3) {
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Ellipse(hdc,	//focusX = 80, focusY = 15
-		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 10,
-		y - EYE_RADIUS - 20,
-		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 10,
-		y + EYE_RADIUS - 20
 	);
 	DeleteObject(hBrush);
 }
@@ -604,36 +508,6 @@ bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
 		return false;
 }
 
-void MutantFish::react(Flag* flag) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	body(127, 255, 0);
-	eye(0, 0, 0);
-	// Отличие предка от потомка - наличие второго глаза
-	second_eye(0, 0, 0);
-	third_eye(0, 0, 0);
-	mouth(169, 169, 169);
-}
-
-void MutantFish::react(Disc* disc) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	body(127, 255, 0);
-	mouth(169, 169, 169);
-}
-
-void MutantFish::react(Brick* brick) {
-	Hide();
-	body(127, 255, 0);
-	eye(0, 0, 0);
-	// Отличие предка от потомка - наличие второго глаза
-	second_eye(0, 0, 0);
-	mouth(169, 169, 169);
-}
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА CircleFish				  *
@@ -642,27 +516,6 @@ void MutantFish::react(Brick* brick) {
 CircleFish::CircleFish(int new_x, int new_y) : Fish(new_x, new_y) {}
 CircleFish::~CircleFish() {}
 
-// Переопределение метода тела рыбы, так как форма не эллипс, а шар
-void CircleFish::body(int clr1, int clr2, int clr3) {
-	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-	SelectObject(hdc, hPen);
-	Ellipse(hdc,
-		x - BODY_FOCUS_X,
-		y - BODY_FOCUS_X,
-		x + BODY_FOCUS_X,
-		y + BODY_FOCUS_X
-	);
-	DeleteObject(hPen);
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Ellipse(hdc,
-		x - BODY_FOCUS_X,
-		y - BODY_FOCUS_X,
-		x + BODY_FOCUS_X,
-		y + BODY_FOCUS_X
-	);
-	DeleteObject(hBrush);
-}
 // Вследствие иного тела, положение плавников меняется
 void CircleFish::bottom_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
@@ -689,28 +542,6 @@ void CircleFish::top_fin(int clr1, int clr2, int clr3) {
 	delete[] points;
 }
 
-void CircleFish::slim_body(int clr1, int clr2, int clr3) {
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Ellipse(hdc,
-		x - BODY_FOCUS_X,
-		y - BODY_FOCUS_Y,
-		x + BODY_FOCUS_X,
-		y + BODY_FOCUS_Y
-	);
-	DeleteObject(hBrush);
-}
-void CircleFish::fat_body(int clr1, int clr2, int clr3) {
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
-	SelectObject(hdc, hBrush);
-	Ellipse(hdc,
-		x - BODY_FOCUS_X,
-		y - BODY_FOCUS_X - 16,
-		x + BODY_FOCUS_X,
-		y + BODY_FOCUS_X + 16
-	);
-	DeleteObject(hBrush);
-}
 void CircleFish::square_body(int clr1, int clr2, int clr3) {
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
 	SelectObject(hdc, hPen);
@@ -737,7 +568,7 @@ void CircleFish::Show() {
 	rear_fin(169, 169, 169);
 	top_fin(169, 169, 169);
 	bottom_fin(169, 169, 169);
-	body(127, 255, 0);
+	square_body(126, 52, 26);
 	eye(0, 0, 0);
 	mouth(169, 169, 169);
 
@@ -747,38 +578,11 @@ void CircleFish::Hide() {
 	rear_fin(255, 255, 255);
 	top_fin(255, 255, 255);
 	bottom_fin(255, 255, 255);
-	body(255, 255, 255);
+	square_body(255, 255, 255);
 	eye(255, 255, 255);
 	mouth(255, 255, 255);
 
 	visible = false;
-}
-
-void CircleFish::react(Flag* flag) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	slim_body(127, 255, 0);
-	eye(0, 0, 0);
-	mouth(169, 169, 169);
-}
-void CircleFish::react(Disc* disc) {
-	Hide();
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	fat_body(127, 255, 0);
-	eye(0, 0, 0);
-	mouth(169, 169, 169);
-}
-void CircleFish::react(Brick* brick) {
-	rear_fin(169, 169, 169);
-	top_fin(169, 169, 169);
-	bottom_fin(169, 169, 169);
-	square_body(127, 255, 0);
-	eye(0, 0, 0);
-	mouth(169, 169, 169);
 }
 
 bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
