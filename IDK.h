@@ -31,6 +31,56 @@ public:
 	void setY(int new_y);
 };
 
+// Абстрактный класс, описывающий препятствие на экране
+class Obstacle : public Location {
+protected:
+	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
+	int size_x;
+	int size_y;
+public:
+	Obstacle(int new_x, int new_y, int new_szX, int new_szY);
+	~Obstacle();
+	int  getsizeX();
+	void setsizeX(int new_szX);
+	int  getsizeY();
+	void setsizeY(int new_szY);
+
+	virtual void Show();
+	virtual void Hide();
+};
+
+// Класс, описывающий препятствие - флаг
+class Flag : public Obstacle {
+protected:
+public:
+	Flag(int new_x, int new_y, int new_szX, int new_szY);
+	~Flag();
+	// Переопределеные методы Hide и Show для флага
+	virtual void Show();
+	virtual void Hide();
+};
+
+// Класс, описывающий препятствие - диск
+class Disc : public Obstacle {
+protected:
+public:
+	Disc(int new_x, int new_y, int new_szX, int new_szY);
+	~Disc();
+	// Переопределеные методы Hide и Show для диска
+	virtual void Show();
+	virtual void Hide();
+};
+
+class Brick : public Obstacle {
+protected:
+public:
+	Brick(int new_x, int new_y, int new_szX, int new_szY);
+	~Brick();
+	// Переопределеные методы Hide и Show для диска
+	virtual void Show();
+	virtual void Hide();
+};
+
 // Класс описывающий точку на экране
 class Point : public Location {
 protected:
@@ -47,46 +97,12 @@ public:
 	void moveTo(int new_x, int new_y);
 	void drag(int step);
 
-};
+	virtual bool hasCollisionWith(Obstacle* obstacle);
+	virtual void react(Flag* flag);
+	virtual void react(Disc* disc);
+	virtual void react(Brick* brick);
 
-//// Абстрактный класс, описывающий препятствие на экране
-//class Obstacle : public Point {
-//protected:
-//	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
-//	int size_x; 
-//	int size_y;	
-//public:
-//	Obstacle(int new_x, int new_y, int new_szX, int new_szY);
-//	~Obstacle();
-//	int  getsizeX();
-//	void setsizeX(int new_szX);
-//	int  getsizeY();
-//	void setsizeY(int new_szY);
-//	// Чистые виртуальные методы, переопределенные в потомках
-//	virtual void Show() = 0;
-//	virtual void Hide() = 0;
-//};
-//
-//// Класс, описывающий препятствие - флаг
-//class Flag : public Obstacle {
-//protected:
-//public:
-//	Flag(int new_x, int new_y, int new_szX, int new_szY);
-//	~Flag();
-//	// Переопределеные методы Hide и Show для флага
-//	virtual void Show();
-//	virtual void Hide();
-//};
-//// Класс, описывающий препятствие - диск
-//class Disc : public Obstacle {
-//protected:
-//public:
-//	Disc(int new_x, int new_y, int new_szX, int new_szY);
-//	~Disc();
-//	// Переопределеные методы Hide и Show для диска
-//	virtual void Show();
-//	virtual void Hide();
-//};
+};
 
 // Базовый класс, описывающий рыбу
 class Fish : public Point {
@@ -119,8 +135,10 @@ public:
 	virtual void Hide();
 
 	// Для дальнейшего использования
-	//virtual bool hasCollisionWith(Obstacle* obstacle);
-	//virtual void react(Flag* flag);
+	virtual bool hasCollisionWith(Obstacle* obstacle);
+	virtual void react(Flag* flag);
+	virtual void react(Disc* disc);
+	virtual void react(Brick* brick);
 };
 
 // Производный класс, описывающий рыбу с шляпой
@@ -131,13 +149,16 @@ public:
 
 	// Объявление уникальных методов - шляпы и поднятой шляпы
 	void hat(int clr1, int clr2, int clr3);
-	//void hat_up();
+	void hat_up(int clr1, int clr2, int clr3);
+	void crown(int clr1, int clr2, int clr3);
 
 	virtual void Show();
 	virtual void Hide();
 
-	//virtual bool hasCollisionWith(Obstacle* obstacle);
-	//virtual void react(Flag* flag);
+	virtual bool hasCollisionWith(Obstacle* obstacle);
+	virtual void react(Flag* flag);
+	virtual void react(Disc* disc);
+	virtual void react(Brick* brick);
 	// Добавить поведение при столкновении
 	// Например, поднимать шляпу при столкновении с флагом 
 	// и менять шляпу на корону при столкновении с диском
@@ -151,13 +172,15 @@ public:
 
 	// Объявление уникальных методов - второго глаза и третьего глаза
 	void second_eye(int clr1, int clr2, int clr3);
-	//void third_eye();
+	void third_eye(int clr1, int clr2, int clr3);
 
 	virtual void Show();
 	virtual void Hide();
 
-	//virtual bool hasCollisionWith(Obstacle* obstacle);
-	//virtual void react(Flag* flag);
+	virtual bool hasCollisionWith(Obstacle* obstacle);
+	virtual void react(Flag* flag);
+	virtual void react(Disc* disc);
+	virtual void react(Brick* brick);
 	// Добавить поведение при столкновении 
 	// Например, добавить третий глаз при столкновении с флагом 
 	// и лишить глаз вообще при столкновении с диском
@@ -170,16 +193,19 @@ public:
 	~CircleFish();
 	// Объявление уникальных методов - круглого, утонченного и утолщенного тел, иного положения плавников
 	void body(int clr1, int clr2, int clr3);
-	//void slim_body();
-	//void fat_body();
+	void slim_body(int clr1, int clr2, int clr3);
+	void fat_body(int clr1, int clr2, int clr3);
+	void square_body(int clr1, int clr2, int clr3);
 	void bottom_fin(int clr1, int clr2, int clr3);
 	void top_fin(int clr1, int clr2, int clr3);
 
 	virtual void Show();
 	virtual void Hide();
 
-	//virtual bool hasCollisionWith(Obstacle* obstacle);
-	//virtual void react(Flag* flag);
+	virtual bool hasCollisionWith(Obstacle* obstacle);
+	virtual void react(Flag* flag);
+	virtual void react(Disc* disc);
+	virtual void react(Brick* brick);
 
 	// Добавить поведение при столкновении
 	// Например, сдуться в эллипс при столкновении с флагом 
@@ -192,4 +218,5 @@ public:
 **********************************************************/
 
 void OperateWith(Fish* fish);
+void demonstrate_collisions();
 void ClearScreen();
