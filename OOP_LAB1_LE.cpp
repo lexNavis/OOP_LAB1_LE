@@ -20,8 +20,6 @@
 
 using namespace std;
 
-//int PPM = 40; //Pixels Per Move
-//bool EXIT_TASK = false; //to break infinite loops
 
 int main() {
     setlocale(LC_ALL, "RUSSIAN");
@@ -29,7 +27,7 @@ int main() {
     int x = 0, y = 0;
     while (1)
     {
-        //EXIT_TASK = false;
+        
         cout << "Выберите действие: \n"
             << "1 - Создать базовую рыбу\n"
             << "2 - Создать рыбу с шляпой\n"
@@ -45,25 +43,7 @@ int main() {
             cin >> x >> y;
             Fish AFish(x, y);
             OperateWith(&AFish);
-            /*while (!EXIT_TASK) {
-                cout << "Выберите действие над базовой рыбой: \n"
-                    << "1 - Показать на экране\n"
-                    << "2 - Скрыть\n"
-                    << "3 - Перемещать\n"
-                    << "Другая цифра - Вернуться на главную\n";
-                cin >> choice;
-                system("cls");
-                switch (choice) {
-                case 1: { AFish.Show();    break; }
-                case 2: { AFish.Hide();    break; }
-                case 3: { AFish.drag(PPM); break; }
-                default: {
-                    EXIT_TASK = true;
-                    cout << "Возращаем...\n";
-                    break;
-                }
-                }
-            }*/
+            
             break;
         }
 
@@ -72,25 +52,7 @@ int main() {
             cin >> x >> y;
             HatFish BFish(x, y);
             OperateWith(&BFish);
-            /*while (!EXIT_TASK) {
-                cout << "Выберите действие над рыбой - патриотом: \n"
-                    << "1 - Показать на экране\n"
-                    << "2 - Скрыть\n"
-                    << "3 - Перемещать\n"
-                    << "Другая цифра - Вернуться на главную\n";
-                cin >> choice;
-                system("cls");
-                switch (choice) {
-                case 1: { BFish.Show();    break; }
-                case 2: { BFish.Hide();    break; }
-                case 3: { BFish.drag(PPM); break; }
-                default: {
-                    EXIT_TASK = true;
-                    cout << "Возращаем...\n";
-                    break;
-                }
-                }
-            }*/
+            
             break;
         }
         case 3: {
@@ -98,25 +60,7 @@ int main() {
             cin >> x >> y;
             MutantFish CFish(x, y);
             OperateWith(&CFish);
-            /*while (!EXIT_TASK) {
-                cout << "Выберите действие над диско-рыбой: \n"
-                    << "1 - Показать на экране\n"
-                    << "2 - Скрыть\n"
-                    << "3 - Перемещать\n"
-                    << "Другая цифра - Вернуться на главную\n";
-                cin >> choice;
-                system("cls");
-                switch (choice) {
-                case 1: { CFish.Show();    break; }
-                case 2: { CFish.Hide();    break; }
-                case 3: { CFish.drag(PPM); break; }
-                default: {
-                    EXIT_TASK = true;
-                    cout << "Возращаем...\n";
-                    break;
-                }
-                }
-            }*/
+            
             break;
         }
         case 4: {
@@ -124,25 +68,7 @@ int main() {
             cin >> x >> y;
             CircleFish DFish(x, y);
             OperateWith(&DFish);
-            /*while (!EXIT_TASK) {
-                cout << "Выберите действие над диско-рыбой: \n"
-                    << "1 - Показать на экране\n"
-                    << "2 - Скрыть\n"
-                    << "3 - Перемещать\n"
-                    << "Другая цифра - Вернуться на главную\n";
-                cin >> choice;
-                system("cls");
-                switch (choice) {
-                case 1: { DFish.Show();    break; }
-                case 2: { DFish.Hide();    break; }
-                case 3: { DFish.drag(PPM); break; }
-                default: {
-                    EXIT_TASK = true;
-                    cout << "Возращаем...\n";
-                    break;
-                }
-                }
-            }*/
+            
             break;
         }
         case 5: {

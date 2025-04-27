@@ -810,58 +810,6 @@ bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
 }
 
 
-
-/****************************************************************
-*						ЗАГОТОВКИ ДЛЯ ВСТАВОК					*
-****************************************************************/
-
-
-/****************************************************************
-*						Drag с препятствием						*
-****************************************************************/
-//void Fish::drag(int step) {
-//	cout << "Enter coordinates of an obstacle (x, y):\n";
-//	int new_x, new_y;
-//	cin >> new_x >> new_y;
-//	Flag AFlag(new_x, new_y, 80, 30);
-//	AFlag.Show();
-//	while (1) {
-//		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
-//		if (KEY_DOWN(VK_ESCAPE)) break;
-//		else if (KEY_DOWN(VK_LEFT))  x = x - step;
-//		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
-//		else if (KEY_DOWN(VK_UP))    y = y - step;
-//		else if (KEY_DOWN(VK_DOWN))  y = y + step;
-//		moveTo(x, y);
-//		if (hasCollisionWith(&AFlag)) {
-//			cout << "Collided!\n";
-//			react(&AFlag);
-//			cout << "Enter (x, y):\n";
-//			int new_x, new_y;
-//			cin >> new_x >> new_y;
-//			AFlag.moveTo(new_x, new_y);
-//			//break;
-//		}
-//		Sleep(200);//чтоб эпилепсии не было
-//	}
-//}
-
-/****************************************************************
-*					Реакционные изменения рыб					*
-****************************************************************/
-
-
-
-/****************************************************************
-*		Проверка на столкновение и реакция на него всех рыб		*
-****************************************************************/
-
-
-
-/****************************************************************
-*					Методы препятствий							*
-****************************************************************/
-
 //defining Obstacle methods
 Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
 	size_x = new_szX;
@@ -897,7 +845,7 @@ void Flag::Show() {
 	Rectangle(hdc, x - size_x / 2, y + size_y / 6, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
 
-	//visible = true;
+	
 }
 void Flag::Hide() {
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
@@ -910,7 +858,7 @@ void Flag::Hide() {
 	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
 
-	//visible = false;
+	
 }
 
 //Disc methods
@@ -982,7 +930,7 @@ void Brick::Show() {
 	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
 
-	//visible = true;
+	
 }
 void Brick::Hide() {
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
@@ -995,26 +943,7 @@ void Brick::Hide() {
 	Rectangle(hdc, x - size_x / 2, y - size_y / 2, x + size_x / 2, y + size_y / 2);
 	DeleteObject(hBrush);
 
-	//visible = false;
+	
 }
 
-/****************************************************************
-*							Остальное							*
-****************************************************************/
-// Если вдруг надо стирать более простым образом
-//void HatFish::Hide() {
-//	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
-//		x2 = x + BODY_FOCUS_X,
-//		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
-//		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2; //основание отрицательное, надо модуль брать
-//	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
-//	SelectObject(hdc, hPen);
-//	Rectangle(hdc, x1, y1, x2, y2); //границу закрасить
-//
-//	HBRUSH hBrush = CreateSolidBrush(RGB(255, 255, 255)); //для заливки
-//	SelectObject(hdc, hBrush);
-//	Rectangle(hdc, x1, y1, x2, y2); //внутренность закрасить
-//	DeleteObject(hBrush);
-//	DeleteObject(hPen);
-//}
 
