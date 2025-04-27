@@ -43,7 +43,7 @@ void OperateWith(Fish* fish) {
 		switch (choice) {
 		case 1: { fish->Show();    break; }
 		case 2: { fish->Hide();    break; }
-		//case 3: { fish->drag(PPM); break; }
+		case 3: { fish->drag(PPM); break; }
 		default: {
 			EXIT_TASK = true;
 			cout << "Возращаем...\n";
@@ -54,20 +54,22 @@ void OperateWith(Fish* fish) {
 }
 
 // Демонстрируем реакцию разных рыб на столкновение с препятствиями
-
 void demonstrate_collisions() {
 
+	// Число рыб для формирования массива рыб
 	const int FISH_COUNT = 4;
 	Fish		BFish(300, 300);
 	HatFish		HFish(300, 300);
 	MutantFish	MFish(300, 300);
-	CircleFish	CFish(300, 300);
+	SquareFish	CFish(300, 300);
 
 	// Массив со всеми существующими рыбами 
 	Fish* fishes[FISH_COUNT] = { &BFish, &HFish, &MFish, &CFish };
+
 	// Указатель на конкретную рыбу 
 	Fish* pFish = nullptr;
 	
+	// Переменная нужна для смены рыбы в зависимости от раздражителя
 	int k = 0;
 
 	while(1) {
@@ -77,6 +79,7 @@ void demonstrate_collisions() {
 
 }
 
+// Выбираем рыбу из массива рыб и присваиваем указателю
 Fish* setFish(Fish** fishes, int pos) {
 	return *(fishes + pos);
 }
@@ -139,11 +142,8 @@ void Point::moveTo(int new_x, int new_y) {
 
 bool Point::hasCollisionWith(Obstacle* obstacle) { return false; }
 
-void Point::react(Flag* flag) {}
-void Point::react(Disc* Disc) {}
-void Point::react(Brick* brick) {}
 
-// Продолжительное движение с заданным шагом
+// Продолжительное движение с заданным шагом + обработка столкновений
 
 int Point::drag(int step) {
 	Flag AFlag(700, 700, 80, 30);
@@ -236,7 +236,7 @@ void Fish::body(int clr1 = 127, int clr2 = 255, int clr3 = 0) {	//салатовый
 
 // Рисование заднего плавника
 void Fish::rear_fin(int clr1, int clr2, int clr3) {
-	//use an array of points to declare a triangle
+	// Массив вершин задает многоугольник(в нашем случае, треугольник)
 	POINT* points = new POINT[3];
 	points[0] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y - REAR_FIN_BASE / 2 };
 	points[1] = { x - BODY_FOCUS_X - REAR_FIN_HEIGHT / 2, y + REAR_FIN_BASE / 2 };
@@ -281,8 +281,6 @@ void Fish::top_fin(int clr1, int clr2, int clr3) {
 void Fish::eye(int clr1, int clr2, int clr3) {
 	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
 	SelectObject(hdc, hBrush);
-	//new_x + f1 / 2 + 30, new_y - 10, 7
-	//Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
 	Ellipse(hdc,
 		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30,
 		y - EYE_RADIUS - 10,
@@ -307,7 +305,7 @@ void Fish::mouth(int clr1, int clr2, int clr3) {
 	delete[] points;
 }
 
-// Отображение и сокрытие рыбы
+// Отображение рыбы
 void Fish::Show() {
 	rear_fin(169, 169, 169);
 	top_fin(169, 169, 169);
@@ -318,6 +316,8 @@ void Fish::Show() {
 
 	visible = true;
 }
+
+// Сокрытие рыбы
 void Fish::Hide() {
 	rear_fin(255, 255, 255);
 	top_fin(255, 255, 255);
@@ -328,6 +328,7 @@ void Fish::Hide() {
 	visible = false;
 }
 
+// Определяет, столкнулась ли рыба с препятствием
 bool Fish::hasCollisionWith(Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
@@ -355,10 +356,6 @@ bool Fish::hasCollisionWith(Obstacle* obstacle) {
 	else
 		return false;
 }
-
-void Fish::react(Flag* flag) {}
-void Fish::react(Disc* disc) {}
-void Fish::react(Brick* brick) {}
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА HatFish					  *
@@ -446,7 +443,7 @@ MutantFish::~MutantFish() {}
 void MutantFish::second_eye(int clr1, int clr2, int clr3) {
 	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
 	SelectObject(hdc, hBrush);
-	Ellipse(hdc,	//focusX = 80, focusY = 15
+	Ellipse(hdc,	
 		x + BODY_FOCUS_X / 2 - EYE_RADIUS + 30 - 20,
 		y - EYE_RADIUS - 10,
 		x + BODY_FOCUS_X / 2 + EYE_RADIUS + 30 - 20,
@@ -510,14 +507,14 @@ bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
 
 
 /**********************************************************
-*				МЕТОДЫ КЛАССА CircleFish				  *
+*				МЕТОДЫ КЛАССА SquareFish				  *
 **********************************************************/
 
-CircleFish::CircleFish(int new_x, int new_y) : Fish(new_x, new_y) {}
-CircleFish::~CircleFish() {}
+SquareFish::SquareFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+SquareFish::~SquareFish() {}
 
-// Вследствие иного тела, положение плавников меняется
-void CircleFish::bottom_fin(int clr1, int clr2, int clr3) {
+// Рисование нижнего плавника рыбы - квадрата
+void SquareFish::bottom_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
 	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
@@ -529,7 +526,9 @@ void CircleFish::bottom_fin(int clr1, int clr2, int clr3) {
 	DeleteObject(hBrush);
 	delete[] points;
 }
-void CircleFish::top_fin(int clr1, int clr2, int clr3) {
+
+// Рисование верхнего плавника рыбы - квадрата
+void SquareFish::top_fin(int clr1, int clr2, int clr3) {
 	POINT* points = new POINT[3];
 	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
 	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
@@ -542,7 +541,8 @@ void CircleFish::top_fin(int clr1, int clr2, int clr3) {
 	delete[] points;
 }
 
-void CircleFish::square_body(int clr1, int clr2, int clr3) {
+// Рисование тела рыбы - квадрата
+void SquareFish::square_body(int clr1, int clr2, int clr3) {
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
 	SelectObject(hdc, hPen);
 	Rectangle(hdc,
@@ -552,7 +552,7 @@ void CircleFish::square_body(int clr1, int clr2, int clr3) {
 		y + BODY_FOCUS_X
 	);
 	DeleteObject(hPen);
-	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); 
 	SelectObject(hdc, hBrush);
 	Rectangle(hdc,
 		x - BODY_FOCUS_X,
@@ -564,7 +564,7 @@ void CircleFish::square_body(int clr1, int clr2, int clr3) {
 }
 
 // Переопределение родительских методов Show и Hide
-void CircleFish::Show() {
+void SquareFish::Show() {
 	rear_fin(169, 169, 169);
 	top_fin(169, 169, 169);
 	bottom_fin(169, 169, 169);
@@ -574,7 +574,7 @@ void CircleFish::Show() {
 
 	visible = true;
 }
-void CircleFish::Hide() {
+void SquareFish::Hide() {
 	rear_fin(255, 255, 255);
 	top_fin(255, 255, 255);
 	bottom_fin(255, 255, 255);
@@ -585,7 +585,7 @@ void CircleFish::Hide() {
 	visible = false;
 }
 
-bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
+bool SquareFish::hasCollisionWith(Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
@@ -614,7 +614,10 @@ bool CircleFish::hasCollisionWith(Obstacle* obstacle) {
 }
 
 
-//defining Obstacle methods
+/**********************************************************
+*				МЕТОДЫ КЛАССА Obstacle				      *
+**********************************************************/
+
 Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
 	size_x = new_szX;
 	size_y = new_szY;
@@ -627,7 +630,10 @@ int  Obstacle::getsizeY() { return size_y; }
 void Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
 void Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
 
-//defining Flag methods
+/**********************************************************
+*				МЕТОДЫ КЛАССА Flag   				      *
+**********************************************************/
+
 Flag::Flag(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
 
 }
@@ -665,7 +671,10 @@ void Flag::Hide() {
 	
 }
 
-//Disc methods
+/**********************************************************
+*				МЕТОДЫ КЛАССА Disc   				      *
+**********************************************************/
+
 Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
 
 }
@@ -717,7 +726,10 @@ void Disc::Hide() {
 }
 
 
-// Brick methods
+/**********************************************************
+*				МЕТОДЫ КЛАССА Brick   				      *
+**********************************************************/
+
 Brick::Brick(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
 
 }

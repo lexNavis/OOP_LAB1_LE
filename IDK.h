@@ -31,7 +31,7 @@ public:
 	void setY(int new_y);
 };
 
-// Абстрактный класс, описывающий препятствие на экране
+// Класс, описывающий препятствие на экране
 class Obstacle : public Location {
 protected:
 	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
@@ -98,9 +98,6 @@ public:
 	int drag(int step);
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-	virtual void react(Disc* disc);
-	virtual void react(Brick* brick);
 
 };
 
@@ -136,9 +133,7 @@ public:
 
 	// Для дальнейшего использования
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	virtual void react(Flag* flag);
-	virtual void react(Disc* disc);
-	virtual void react(Brick* brick);
+	
 };
 
 // Производный класс, описывающий рыбу с шляпой
@@ -155,9 +150,6 @@ public:
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
 	
-	// Добавить поведение при столкновении
-	// Например, поднимать шляпу при столкновении с флагом 
-	// и менять шляпу на корону при столкновении с диском
 };
 
 // Производный класс, описывающий рыбу с двумя глазами
@@ -166,7 +158,7 @@ public:
 	MutantFish(int new_x, int new_y);
 	~MutantFish();
 
-	// Объявление уникальных методов - второго глаза и третьего глаза
+	// Объявление уникальных методов - второго глаза
 	void second_eye(int clr1, int clr2, int clr3);
 
 	virtual void Show();
@@ -174,17 +166,14 @@ public:
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
 
-	// Добавить поведение при столкновении 
-	// Например, добавить третий глаз при столкновении с флагом 
-	// и лишить глаз вообще при столкновении с диском
 };
 
-// Производный класс, описывающий рыбу - шар
-class CircleFish : public Fish {
+// Производный класс, описывающий рыбу - квадрат
+class SquareFish : public Fish {
 public:
-	CircleFish(int new_x, int new_y);
-	~CircleFish();
-	// Объявление уникальных методов - круглого, утонченного и утолщенного тел, иного положения плавников
+	SquareFish(int new_x, int new_y);
+	~SquareFish();
+	// Объявление уникальных методов -  иных плавников и квадратного тела
 	void square_body(int clr1, int clr2, int clr3);
 	void bottom_fin(int clr1, int clr2, int clr3);
 	void top_fin(int clr1, int clr2, int clr3);
@@ -193,11 +182,6 @@ public:
 	virtual void Hide();
 
 	virtual bool hasCollisionWith(Obstacle* obstacle);
-	
-
-	// Добавить поведение при столкновении
-	// Например, сдуться в эллипс при столкновении с флагом 
-	// и стать вертикальным эллипсом при столкновении с диском
 };
 
 
@@ -208,5 +192,4 @@ public:
 void OperateWith(Fish* fish);
 void demonstrate_collisions();
 void ClearScreen();
-
 Fish* setFish(Fish** fishes, int pos);
