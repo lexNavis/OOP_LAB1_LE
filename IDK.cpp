@@ -55,33 +55,44 @@ void OperateWith(Fish* fish) {
 
 // Демонстрируем реакцию разных рыб на столкновение с препятствиями
 void demonstrate_collisions() {
-
+	
 	// Число рыб для формирования массива рыб
-	const int FISH_COUNT = 4;
-	Fish		BFish(300, 300);
-	HatFish		HFish(300, 300);
-	MutantFish	MFish(300, 300);
-	SquareFish	CFish(300, 300);
+	const int FISH_COUNT = 5;
+	Fish		BFish(700, 300);
+	HatFish		HFish(700, 300);
+	MutantFish	MFish(700, 300);
+	SquareFish	SFish(700, 300);
+	CircleFish	CFish(700, 300);
 
 	// Массив со всеми существующими рыбами 
-	Fish* fishes[FISH_COUNT] = { &BFish, &HFish, &MFish, &CFish };
+	Fish* fishes[5][4] = {
+		{ &BFish, &HFish, &CFish, &SFish },
+		{ &BFish, &SFish, &MFish, &CFish },
+		{ &BFish, &CFish, &HFish, &BFish },
+		{ &BFish, &BFish, &CFish, &MFish },
+		{ &BFish, &MFish, &BFish, &HFish }
+	};
+
+
 
 	// Указатель на конкретную рыбу 
-	Fish* pFish = nullptr;
+	Fish* pFish = &BFish;
 	
 	// Переменная нужна для смены рыбы в зависимости от раздражителя
 	int k = 0;
 
 	while(1) {
-		pFish = setFish(fishes, k);
+		// Получение индекса столбца для выбора рыбы
 		k = pFish->drag(PPM);
+		// Выбираем рыбу из массива
+		pFish = setFish(fishes, pFish->getID(), k);
 	}
 
 }
 
 // Выбираем рыбу из массива рыб и присваиваем указателю
-Fish* setFish(Fish** fishes, int pos) {
-	return *(fishes + pos);
+Fish* setFish(Fish* fishes[5][4], int row, int col) {
+	return fishes[row][col];
 }
 
 // Очистка экрана консоли
@@ -113,7 +124,7 @@ void Location::setY(int new_y) { y = new_y; }
 *				МЕТОДЫ КЛАССА Point						  *
 **********************************************************/
 
-Point::Point(int new_x, int new_y) : Location(new_x, new_y) { visible = false; }
+Point::Point(int new_x, int new_y) : ABC_Object(new_x, new_y) { visible = false; }
 Point::~Point() {}
 
 void Point::setVisible(bool new_visible) { visible = new_visible; }
@@ -139,8 +150,8 @@ void Point::moveTo(int new_x, int new_y) {
 	setY(new_y);
 	Show();
 }
-
-bool Point::hasCollisionWith(Obstacle* obstacle) { return false; }
+// Проверка на столкновение с препятствием
+bool Point::hasCollisionWith(ABC_Obstacle* obstacle) { return false; }
 
 
 // Продолжительное движение с заданным шагом + обработка столкновений
@@ -156,47 +167,61 @@ int Point::drag(int step) {
 
 	while (1) {
 		Hide(); //Затирка привязана к текущим координатам, заранее стираем объект до изменения координаты
+		// Обработка нажатия клавиш
 		if (KEY_DOWN(VK_ESCAPE)) return 0;
 		else if (KEY_DOWN(VK_LEFT))  x = x - step;
 		else if (KEY_DOWN(VK_RIGHT)) x = x + step;
 		else if (KEY_DOWN(VK_UP))    y = y - step;
 		else if (KEY_DOWN(VK_DOWN))  y = y + step;
 		moveTo(x, y);
+		// Ветка столкновения с флагом
 		if (hasCollisionWith(&AFlag)) {
 			cout << "Collided with Flag!\n";
 			Sleep(200);
 			ClearScreen();
 			// Вернем рыбу на свое место
-			setX(300); setY(300);
-			return 1;
+			setX(700); setY(300);
+			return AFlag.getID();
 		}
+		// Ветка столкновения с диском
 		if (hasCollisionWith(&ADisc)) {
 			cout << "Collided with Disc\n";
 			Sleep(200);
 			ClearScreen();
-			setX(300); setY(300);
-			return 2;
+			setX(700); setY(300);
+			return ADisc.getID();
 		}
+		// Ветка столкновения с кирпичиком
 		if (hasCollisionWith(&ABrick)) {
 			cout << "Collided with Brick\n";
 			Sleep(200);
 			ClearScreen();
-			setX(300); setY(300);
-			return 3;
+			setX(700); setY(300);
+			return ABrick.getID();
 		}
-		Sleep(200);//чтоб эпилепсии не было
+		Sleep(100);
 	}
 }
 
+/**********************************************************
+*				МЕТОДЫ КЛАССА ABC_Object				  *
+**********************************************************/
 
-
+ABC_Object::ABC_Object(int new_x, int new_y) : Location(new_x, new_y) {}
+ABC_Object::~ABC_Object() {}
+//int ABC_Object::GetLeftTopX()		{ return left_top_x; }
+//int ABC_Object::GetLeftTopY()		{ return left_top_y; }
+//int ABC_Object::GetRightBottomX()	{ return right_bottom_x; }
+//int ABC_Object::GetRightBottomY()	{ return right_bottom_y; }
+int ABC_Object::getID()				{ return id; }
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА Fish						  *
 **********************************************************/
 
 Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {
-	// Параметры рыбы
+	id = 0;
+
 	BODY_FOCUS_X = 100;
 	BODY_FOCUS_Y = 40;
 	REAR_FIN_HEIGHT = 70;
@@ -208,12 +233,18 @@ Fish::Fish(int new_x, int new_y) : Point(new_x, new_y) {
 	EYE_RADIUS = 7;
 	MOUTH_HEIGHT = -30;
 	MOUTH_BASE = -8;
+
+	/*left_top_x = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2;
+	left_top_y = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2;
+	right_bottom_x = x + BODY_FOCUS_X;
+	right_bottom_y = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;*/
 }
 Fish::~Fish() {}
 
+
 // Рисование тела рыбы
 void Fish::body(int clr1 = 127, int clr2 = 255, int clr3 = 0) {	//салатовый
-	// Чтобы не обводило черным цветом
+	// Белое перо для обводки
 	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
 	SelectObject(hdc, hPen);
 	Ellipse(hdc,
@@ -328,8 +359,8 @@ void Fish::Hide() {
 	visible = false;
 }
 
-// Определяет, столкнулась ли рыба с препятствием
-bool Fish::hasCollisionWith(Obstacle* obstacle) {
+// Проверка на столкновение с препятствием
+bool Fish::hasCollisionWith(ABC_Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
@@ -361,7 +392,9 @@ bool Fish::hasCollisionWith(Obstacle* obstacle) {
 *				МЕТОДЫ КЛАССА HatFish					  *
 **********************************************************/
 
-HatFish::HatFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+HatFish::HatFish(int new_x, int new_y) : Fish(new_x, new_y) {
+	id = 1;
+}
 HatFish::~HatFish() {}
 
 // Рисование шляпы
@@ -402,8 +435,8 @@ void HatFish::Hide() {
 
 	visible = false;
 }
-
-bool HatFish::hasCollisionWith(Obstacle* obstacle) {
+// Проверка на столкновение с препятствием
+bool HatFish::hasCollisionWith(ABC_Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
@@ -436,7 +469,9 @@ bool HatFish::hasCollisionWith(Obstacle* obstacle) {
 *				МЕТОДЫ КЛАССА MutantFish				  *
 **********************************************************/
 
-MutantFish::MutantFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+MutantFish::MutantFish(int new_x, int new_y) : Fish(new_x, new_y) {
+	id = 2;
+}
 MutantFish::~MutantFish() {}
 
 // Рисование второго глаза
@@ -476,8 +511,8 @@ void MutantFish::Hide() {
 
 	visible = false;
 }
-
-bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
+// Проверка на столкновение с препятствием
+bool MutantFish::hasCollisionWith(ABC_Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
@@ -510,7 +545,9 @@ bool MutantFish::hasCollisionWith(Obstacle* obstacle) {
 *				МЕТОДЫ КЛАССА SquareFish				  *
 **********************************************************/
 
-SquareFish::SquareFish(int new_x, int new_y) : Fish(new_x, new_y) {}
+SquareFish::SquareFish(int new_x, int new_y) : Fish(new_x, new_y) {
+	id = 3;
+}
 SquareFish::~SquareFish() {}
 
 // Рисование нижнего плавника рыбы - квадрата
@@ -585,7 +622,8 @@ void SquareFish::Hide() {
 	visible = false;
 }
 
-bool SquareFish::hasCollisionWith(Obstacle* obstacle) {
+// Проверка на столкновение с препятствием
+bool SquareFish::hasCollisionWith(ABC_Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
@@ -613,29 +651,132 @@ bool SquareFish::hasCollisionWith(Obstacle* obstacle) {
 		return false;
 }
 
-
 /**********************************************************
-*				МЕТОДЫ КЛАССА Obstacle				      *
+*				МЕТОДЫ КЛАССА CircleFish				  *
 **********************************************************/
 
-Obstacle::Obstacle(int new_x, int new_y, int new_szX, int new_szY) : Location(new_x, new_y) {
+CircleFish::CircleFish(int new_x, int new_y) : Fish(new_x, new_y) {
+	id = 4;
+}
+CircleFish::~CircleFish() {}
+
+// Переопределение метода тела рыбы, так как форма не эллипс, а шар
+void CircleFish::body(int clr1, int clr2, int clr3) {
+	HPEN hPen = CreatePen(PS_SOLID, PEN_WIDTH, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hPen);
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //салатовый
+	SelectObject(hdc, hBrush);
+	Ellipse(hdc,
+		x - BODY_FOCUS_X,
+		y - BODY_FOCUS_X,
+		x + BODY_FOCUS_X,
+		y + BODY_FOCUS_X
+	);
+	DeleteObject(hBrush);
+}
+// Вследствие иного тела, положение плавников меняется
+void CircleFish::bottom_fin(int clr1, int clr2, int clr3) {
+	POINT* points = new POINT[3];
+	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
+	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 25, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_X + 15 };
+	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_X + 15 };
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+void CircleFish::top_fin(int clr1, int clr2, int clr3) {
+	POINT* points = new POINT[3];
+	points[0] = { x - TOP_FIN_HEIGHT / 2 + 25, y - TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
+	points[1] = { x - TOP_FIN_HEIGHT / 2 + 25, y + TOP_FIN_BASE / 2 - BODY_FOCUS_X - 15 };
+	points[2] = { x + TOP_FIN_HEIGHT / 2 + 25, y - BODY_FOCUS_X - 15 };
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+
+// Переопределение родительских методов Show и Hide
+void CircleFish::Show() {
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	mouth(169, 169, 169);
+
+	visible = true;
+}
+void CircleFish::Hide() {
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	mouth(255, 255, 255);
+
+	visible = false;
+}
+
+bool CircleFish::hasCollisionWith(ABC_Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_X - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_X + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
+
+/**********************************************************
+*				МЕТОДЫ КЛАССА ABC_Obstacle				  *
+**********************************************************/
+
+ABC_Obstacle::ABC_Obstacle(int new_x, int new_y, int new_szX, int new_szY) : ABC_Object(new_x, new_y) {
 	size_x = new_szX;
 	size_y = new_szY;
 }
-Obstacle::~Obstacle() {}
-void Obstacle::Show() {}
-void Obstacle::Hide() {}
-int  Obstacle::getsizeX() { return size_x; }
-int  Obstacle::getsizeY() { return size_y; }
-void Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
-void Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
+ABC_Obstacle::~ABC_Obstacle() {}
+int  ABC_Obstacle::getsizeX() { return size_x; }
+int  ABC_Obstacle::getsizeY() { return size_y; }
+void ABC_Obstacle::setsizeX(int new_szX) { size_x = new_szX; }
+void ABC_Obstacle::setsizeY(int new_szY) { size_y = new_szY; }
 
 /**********************************************************
 *				МЕТОДЫ КЛАССА Flag   				      *
 **********************************************************/
 
-Flag::Flag(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
-
+Flag::Flag(int new_x, int new_y, int new_szX, int new_szY) : ABC_Obstacle(new_x, new_y, new_szX, new_szY) {
+	id = 1;
 }
 Flag::~Flag() {}
 void Flag::Show() {
@@ -675,8 +816,8 @@ void Flag::Hide() {
 *				МЕТОДЫ КЛАССА Disc   				      *
 **********************************************************/
 
-Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
-
+Disc::Disc(int new_x, int new_y, int new_szX, int new_szY) : ABC_Obstacle(new_x, new_y, new_szX, new_szY) {
+	id = 2;
 }
 Disc::~Disc() {}
 void Disc::Show() {
@@ -730,8 +871,8 @@ void Disc::Hide() {
 *				МЕТОДЫ КЛАССА Brick   				      *
 **********************************************************/
 
-Brick::Brick(int new_x, int new_y, int new_szX, int new_szY) : Obstacle(new_x, new_y, new_szX, new_szY) {
-
+Brick::Brick(int new_x, int new_y, int new_szX, int new_szY) : ABC_Obstacle(new_x, new_y, new_szX, new_szY) {
+	id = 3;
 }
 Brick::~Brick() {}
 void Brick::Show() {
