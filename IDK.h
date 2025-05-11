@@ -34,29 +34,32 @@ public:
 // Интерфейс для иерархии рыб
 class IFish {
 public:
-	// Отрисовка тела рыбы
+	// Чистая вирт. функция отрисовки тела рыбы
 	virtual void body(int clr1, int clr2, int clr3) = 0;
-	// Отрисовка заднего плавника рыбы
+	// Чистая вирт. функция отрисовки заднего плавника рыбы
 	virtual void rear_fin(int clr1, int clr2, int clr3) = 0;
-	// Отрисовка нижнего плавника рыбы
+	// Чистая вирт. функция отрисовки нижнего плавника рыбы
 	virtual void bottom_fin(int clr1, int clr2, int clr3) = 0;
-	// Отрисовка верхнего плавника рыбы
+	// Чистая вирт. функция отрисовки верхнего плавника рыбы
 	virtual void top_fin(int clr1, int clr2, int clr3) = 0;
-	// Отрисовка глаза рыбы
+	// Чистая вирт. функция отрисовки глаза рыбы
 	virtual void eye(int clr1, int clr2, int clr3) = 0;
-	// Отрисовка рта рыбы
+	// Чистая вирт. функция отрисовки рта рыбы
 	virtual void mouth(int clr1, int clr2, int clr3) = 0;
 };
 
-
+// Абстрактный базовый класс - объект
 class ABC_Object : public Location {
 protected:
+	// Идентификатор объекта
 	int id;
 public:
 	ABC_Object(int new_x, int new_y);
 	~ABC_Object();
 	int getID();
+	// Чистая вирт. функция - показать объект
 	virtual void Show() = 0;
+	// Чистая вирт. функция - убрать объект
 	virtual void Hide() = 0;
 };
 
@@ -66,7 +69,7 @@ protected:
 	// Препятствия будут вписаны в прямоугольник с длиной size_x и шириной size_y
 	int size_x;
 	int size_y;
-	// Идентификатор препятствия
+	
 public:
 	ABC_Obstacle(int new_x, int new_y, int new_szX, int new_szY);
 	~ABC_Obstacle();
@@ -166,7 +169,7 @@ protected:
 public:
 	Fish(int new_x, int new_y);
 	~Fish();
-
+	// Принудительное переопределение чистых виртуальных функций
 	// Отрисовка тела рыбы
 	void body(int clr1, int clr2, int clr3);
 	// Отрисовка заднего плавника рыбы
@@ -238,9 +241,9 @@ public:
 	void bottom_fin(int clr1, int clr2, int clr3);
 	// Переопределение рисования верхнего плавника
 	void top_fin(int clr1, int clr2, int clr3);
-	// Переопределеные методы Show для базовой рыбы
+	// Переопределеные метод Show 
 	virtual void Show();
-	// Переопределеные методы Hide для базовой рыбы
+	// Переопределеные метод Hide
 	virtual void Hide();
 	// Проверка на столкновение с препятствием
 	virtual bool hasCollisionWith(ABC_Obstacle* obstacle);
