@@ -61,16 +61,18 @@ void demonstrate_collisions() {
 	Fish		BFish(700, 300);
 	HatFish		HFish(700, 300);
 	MutantFish	MFish(700, 300);
+	MutantFish1	M1Fish(700, 300);
 	SquareFish	SFish(700, 300);
 	CircleFish	CFish(700, 300);
 
 	// Массив со всеми существующими рыбами 
-	Fish* fishes[5][4] = {
-		{ &BFish, &HFish, &CFish, &SFish },
+	Fish* fishes[6][4] = {
+		{ &BFish, &HFish, &M1Fish, &SFish },
 		{ &BFish, &SFish, &MFish, &CFish },
 		{ &BFish, &CFish, &HFish, &BFish },
 		{ &BFish, &BFish, &CFish, &MFish },
-		{ &BFish, &MFish, &BFish, &HFish }
+		{ &BFish, &MFish, &BFish, &HFish },
+		{ &BFish,& MFish,& BFish,& HFish }
 	};
 
 
@@ -513,6 +515,85 @@ void MutantFish::Hide() {
 }
 // Проверка на столкновение с препятствием
 bool MutantFish::hasCollisionWith(ABC_Obstacle* obstacle) {
+	// Параметры препятствия
+	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
+		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();
+	// Коориднаты лев.верх и правого нижнего угла грани рыбы
+	int x1 = x - BODY_FOCUS_X - abs(REAR_FIN_HEIGHT) / 2,
+		x2 = x + BODY_FOCUS_X,
+		y1 = y - BODY_FOCUS_Y - 15 - abs(TOP_FIN_BASE) / 2,
+		y2 = y + BODY_FOCUS_Y + 15 + abs(BOTTOM_FIN_BASE) / 2;
+
+	if (
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x - size_x / 2 >= x1) && (obstacle_x - size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y - size_y / 2 >= y1) && (obstacle_y - size_y / 2 <= y2)))
+		||
+		(((obstacle_x + size_x / 2 >= x1) && (obstacle_x + size_x / 2 <= x2)) &&
+			((obstacle_y + size_y / 2 >= y1) && (obstacle_y + size_y / 2 <= y2)))
+		)
+		return true;
+	else
+		return false;
+}
+
+
+/**********************************************************
+*				МЕТОДЫ КЛАССА MutantFish				  *
+**********************************************************/
+
+MutantFish1::MutantFish1(int new_x, int new_y) : MutantFish(new_x, new_y) {
+	id = 5;
+}
+MutantFish1::~MutantFish1() {}
+
+// Рисование второго глаза
+void MutantFish1::second_fin(int clr1, int clr2, int clr3) {
+	POINT* points = new POINT[3];
+	points[0] = { x - BOTTOM_FIN_HEIGHT / 2 - 50, y - BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[1] = { x - BOTTOM_FIN_HEIGHT / 2 - 30, y + BOTTOM_FIN_BASE / 2 + BODY_FOCUS_Y + 15 };
+	points[2] = { x + BOTTOM_FIN_HEIGHT / 2 - 25, y + BODY_FOCUS_Y + 15 };
+
+	HBRUSH hBrush = CreateSolidBrush(RGB(clr1, clr2, clr3)); //для заливки
+	SelectObject(hdc, hBrush);
+	Polygon(hdc, points, 3);
+	DeleteObject(hBrush);
+	delete[] points;
+}
+
+// Переопределение родительских методов Show и Hide
+void MutantFish1::Show() {
+	rear_fin(169, 169, 169);
+	top_fin(169, 169, 169);
+	bottom_fin(169, 169, 169);
+	body(127, 255, 0);
+	eye(0, 0, 0);
+	// Отличие предка от потомка - наличие второго глаза
+	second_eye(0, 0, 0);
+	second_fin(169, 169, 169);
+	mouth(169, 169, 169);
+
+	visible = true;
+}
+void MutantFish1::Hide() {
+	rear_fin(255, 255, 255);
+	top_fin(255, 255, 255);
+	bottom_fin(255, 255, 255);
+	body(255, 255, 255);
+	eye(255, 255, 255);
+	second_eye(255, 255, 255);
+	second_fin(255, 255, 255);
+	mouth(255, 255, 255);
+
+	visible = false;
+}
+// Проверка на столкновение с препятствием
+bool MutantFish1::hasCollisionWith(ABC_Obstacle* obstacle) {
 	// Параметры препятствия
 	int obstacle_x = obstacle->getX(), obstacle_y = obstacle->getY(),
 		size_x = obstacle->getsizeX(), size_y = obstacle->getsizeY();

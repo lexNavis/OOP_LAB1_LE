@@ -227,6 +227,24 @@ public:
 
 };
 
+class MutantFish1 : public MutantFish {
+public:
+	MutantFish1(int new_x, int new_y);
+	~MutantFish1();
+
+	// Объявление уникальных методов - второго глаза
+	void second_fin(int clr1, int clr2, int clr3);
+
+	// Переопределеные методы Show для базовой рыбы
+	virtual void Show();
+	// Переопределеные методы Hide для базовой рыбы
+	virtual void Hide();
+
+	// Проверка на столкновение с препятствием
+	virtual bool hasCollisionWith(ABC_Obstacle* obstacle);
+
+};
+
 // Производный класс, описывающий рыбу - квадрат
 class SquareFish : public Fish {
 public:
